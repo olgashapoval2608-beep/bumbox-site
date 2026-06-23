@@ -16,6 +16,9 @@
 </head>
 <body class="is-loading">
 
+  <!-- Cinematic intro: black → noise → reveal -->
+  <div class="intro" aria-hidden="true"></div>
+
   <!-- ============ GLOBAL CINEMATIC OVERLAYS ============ -->
   <div class="grain" aria-hidden="true"></div>
   <div class="vignette" aria-hidden="true"></div>
@@ -27,6 +30,7 @@
 
   <!-- Custom cursor -->
   <div class="cursor" aria-hidden="true">
+    <span class="cursor__wave"></span>
     <span class="cursor__ring"></span>
     <span class="cursor__dot">▶</span>
   </div>
@@ -52,13 +56,13 @@
 
   <!-- ============ 1. HERO ============ -->
   <header id="hero" class="hero section">
-    <div class="hero__spot" aria-hidden="true"></div>
-
     <div class="hero__inner">
+      <div class="hero__spot" aria-hidden="true"></div>
+
       <p class="hero__eyebrow">КИЇВ · 2004 — ∞</p>
 
       <!-- The Boombox (built in CSS) -->
-      <div class="boombox" id="boombox" role="img" aria-label="Старий касетний магнітофон Бумбокс">
+      <div class="boombox" id="boombox" data-cursor="▶" role="img" aria-label="Старий касетний магнітофон Бумбокс">
         <div class="boombox__handle"></div>
         <div class="boombox__body">
           <!-- left speaker -->
@@ -86,7 +90,7 @@
               <button class="ctrl" aria-label="Rewind">◄◄</button>
               <button class="ctrl ctrl--play" id="playBtn" aria-label="Play — почати історію">
                 <span class="ctrl__glyph">▶</span>
-                <span class="ctrl__hint">почати історію</span>
+                <span class="ctrl__hint" id="playHint">почати історію</span>
               </button>
               <button class="ctrl" aria-label="Forward">►►</button>
             </div>
@@ -97,9 +101,15 @@
             <div class="speaker__cone"></div>
           </div>
         </div>
+        <!-- traces of time: stickers, scratches, dust, scuffs -->
         <div class="boombox__wear" aria-hidden="true">
-          <span class="sticker sticker--1">KYIV</span>
-          <span class="sticker sticker--2">2004</span>
+          <span class="sticker sticker--1">KYIV '04</span>
+          <span class="sticker sticker--2">LIVE</span>
+          <span class="sticker sticker--3">★ 20</span>
+          <span class="wear-scratch wear-scratch--1"></span>
+          <span class="wear-scratch wear-scratch--2"></span>
+          <span class="wear-dust"></span>
+          <span class="wear-scuff"></span>
         </div>
       </div>
 
@@ -110,12 +120,14 @@
         <a href="#albums" class="btn btn--solid" data-cursor="▶">Слухати</a>
         <a href="#tours" class="btn btn--ghost">Квитки на концерти</a>
       </div>
-    </div>
 
-    <a href="#history" class="scroll-cue" data-cursor="↓">
-      <span>гортай, щоб перемотати спогади</span>
-      <span class="scroll-cue__arrow">↓</span>
-    </a>
+      <p class="deco-label" id="decoLabel" aria-hidden="true">корпус</p>
+
+      <a href="#history" class="scroll-cue" data-cursor="↓">
+        <span>гортай, щоб перемотати спогади</span>
+        <span class="scroll-cue__arrow">↓</span>
+      </a>
+    </div>
   </header>
 
   <!-- ============ 2. HISTORY ============ -->

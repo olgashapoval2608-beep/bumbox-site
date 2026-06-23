@@ -45,20 +45,27 @@
      ================================================================= */
   const boombox = $('#boombox');
   const playBtn = $('#playBtn');
+  const displayEl = $('#display');
   const display = $('#displayText');
   const displaySub = $('#displaySub');
+  const playHint = $('#playHint');
   const warp = $('.warp');
+
+  // mobile: the spec wants a tap-friendly label
+  if ((isTouch || innerWidth <= 720) && playHint) playHint.textContent = 'Торкнись PLAY';
 
   if (playBtn) {
     playBtn.addEventListener('mouseenter', () => {
-      boombox.classList.add('vibe');
-      display.textContent = 'PLAY';
+      if (boombox.classList.contains('playing')) return;
+      boombox.classList.add('vibe', 'hovering');   // speakers vibrate + faint sound wave
+      if (displayEl) displayEl.classList.add('blink');
+      display.textContent = 'PLAY';                // display blinks PLAY
     });
     playBtn.addEventListener('mouseleave', () => {
-      if (!boombox.classList.contains('playing')) {
-        boombox.classList.remove('vibe');
-        display.textContent = 'БУМБОКС';
-      }
+      if (boombox.classList.contains('playing')) return;
+      boombox.classList.remove('vibe', 'hovering');
+      if (displayEl) displayEl.classList.remove('blink');
+      display.textContent = 'БУМБОКС';
     });
     playBtn.addEventListener('click', startStory);
   }
@@ -71,6 +78,8 @@
 
   function startStory() {
     if (boombox.classList.contains('playing')) { goTo('#history'); return; }
+    boombox.classList.remove('hovering');
+    if (displayEl) displayEl.classList.remove('blink');
     boombox.classList.add('playing', 'vibe');
     flashWave();
 
@@ -103,7 +112,8 @@
     warp.style.left = (sp.left + sp.width / 2) + 'px';
     warp.style.top = (sp.top + sp.height / 2) + 'px';
     warp.classList.remove('go'); void warp.offsetWidth; warp.classList.add('go');
-    setTimeout(() => goTo('#history'), 600);
+    // jump instantly while the warp covers the screen (hero is now a tall sticky zone)
+    setTimeout(() => { const h = $('#history'); if (h) h.scrollIntoView({ behavior: 'auto' }); }, 600);
     setTimeout(() => warp.classList.remove('go'), 1300);
   }
 
@@ -320,12 +330,66 @@
       setTimeout(() => scrollTo({ top: 0, behavior: 'auto' }), 700);
       setTimeout(() => {
         rewind.classList.remove('go');
-        // replay hero intro
-        boombox.classList.remove('playing', 'vibe');
+        // reset hero
+        boombox.classList.remove('playing', 'vibe', 'hovering');
+        if (displayEl) displayEl.classList.remove('blink');
         display.textContent = 'БУМБОКС';
         displaySub.textContent = 'stereo cassette';
+        updateHeroDecompose();
       }, 1400);
     });
+  }
+
+  /* =================================================================
+     HERO — sticky scroll "decompose": корпус → касета → стрічка → звук → концерт
+     ================================================================= */
+  const heroZone = $('#hero');
+  const heroCopy = $$('.hero__eyebrow, .hero__title, .hero__lead, .hero__cta');
+  const scrollCue = $('.scroll-cue');
+  const decoLabel = $('#decoLabel');
+  const bbHandle = $('.boombox__handle');
+  const bbLeft = $('.speaker--left');
+  const bbRight = $('.speaker--right');
+  const bbCenter = $('.boombox__center');
+  const bbBody = $('.boombox__body');
+  const decoLayers = ['корпус', 'касета', 'стрічка', 'звук', 'концерт'];
+
+  function clearDecompose() {
+    [bbHandle, bbLeft, bbRight, bbCenter, bbBody].forEach((el) => {
+      if (el) { el.style.transform = ''; el.style.opacity = ''; el.style.filter = ''; el.style.boxShadow = ''; }
+    });
+    heroCopy.forEach((el) => el.style.removeProperty('opacity'));
+    if (scrollCue) scrollCue.style.removeProperty('opacity');
+    if (decoLabel) decoLabel.style.opacity = '0';
+  }
+
+  function updateHeroDecompose() {
+    if (!heroZone || !bbBody) return;
+    if (reduceMotion || innerWidth <= 720) { clearDecompose(); return; }
+    if (boombox.classList.contains('playing')) return;     // don't fight the PLAY warp
+    const total = heroZone.offsetHeight - innerHeight;
+    const p = total > 0 ? Math.min(1, Math.max(0, scrollY / total)) : 0;
+    if (p <= 0.001) { clearDecompose(); return; }
+
+    bbHandle.style.transform = `translateY(${-p * 230}px) rotate(${-p * 6}deg)`;
+    bbHandle.style.opacity = String(1 - p);
+    bbLeft.style.transform = `translate(${-p * 46}vw, ${-p * 9}vh) rotate(${-p * 38}deg)`;
+    bbLeft.style.opacity = String(1 - p * 0.7);
+    bbCenter.style.transform = `translateY(${p * 36}vh) scale(${1 - p * 0.12})`;
+    bbCenter.style.opacity = String(1 - p * 0.85);
+    // the right speaker survives and swells into a concert spotlight
+    bbRight.style.transform = `translate(${p * 10}vw, ${-p * 2}vh) scale(${1 + p * 0.9})`;
+    bbRight.style.filter = `brightness(${1 + p * 1.4})`;
+    bbRight.style.boxShadow = `0 0 ${p * 90}px ${p * 22}px rgba(245,197,24,${p * 0.55})`;
+    bbBody.style.opacity = String(1 - p * 0.35);
+
+    const copyOpacity = String(Math.max(0, 1 - p * 4));   // !important beats the fadeUp entrance animation
+    heroCopy.forEach((el) => el.style.setProperty('opacity', copyOpacity, 'important'));
+    if (scrollCue) scrollCue.style.setProperty('opacity', copyOpacity, 'important');
+    if (decoLabel) {
+      decoLabel.textContent = decoLayers[Math.min(decoLayers.length - 1, Math.floor(p * decoLayers.length))];
+      decoLabel.style.opacity = p > 0.05 && p < 0.97 ? '0.85' : '0';
+    }
   }
 
   /* =================================================================
@@ -336,6 +400,7 @@
     if (ticking) return;
     ticking = true;
     requestAnimationFrame(() => {
+      updateHeroDecompose();
       updateAlbums();
 
       // history mini-player progress
@@ -361,6 +426,7 @@
     });
   }
   addEventListener('scroll', onScroll, { passive: true });
-  addEventListener('resize', () => { updateAlbums(); });
+  addEventListener('resize', () => { updateAlbums(); updateHeroDecompose(); });
   updateAlbums();
+  updateHeroDecompose();
 })();
