@@ -263,13 +263,19 @@
      MOMENTS — scattered photo archive + crowd assembly
      ================================================================= */
   const scatter = $('#scatter');
-  const tags = ['сцена', 'натовп', '2008', 'студія', 'тур', 'backstage', 'саундчек', 'Київ', 'live', 'архів', 'гастролі', 'фінал'];
+  const tags = ['сцена', 'натовп', '2004', 'гурт', 'тур', 'backstage', 'саундчек', 'Київ', 'live', 'архів', 'гастролі', 'фінал'];
+  const momentPhotos = ['concert-big', 'crowd-people', 'band-full', 'concert-club', 'concert-festival',
+    'history-2004-trio', 'history-inna', 'portrait-khlivniuk', 'history-khlivniuk-army', 'portrait-samoylo',
+    'concert-big', 'concert-festival', 'crowd-people', 'band-full'];
   if (scatter) {
     const N = innerWidth <= 720 ? 8 : 14;
     for (let i = 0; i < N; i++) {
       const ph = document.createElement('figure');
       ph.className = 'photo';
       ph.dataset.tag = tags[i % tags.length];
+      ph.style.backgroundImage = `url(assets/${momentPhotos[i % momentPhotos.length]}.jpg)`;
+      ph.style.backgroundSize = 'cover';
+      ph.style.backgroundPosition = 'center';
       if (innerWidth > 720) {
         const left = 4 + Math.random() * 80;
         const top = 2 + Math.random() * 64;
@@ -287,6 +293,12 @@
       scatter.appendChild(ph);
     }
   }
+
+  // merch archive strip — real backstage/concert frames
+  const archiveImgs = ['concert-festival', 'crowd-people', 'concert-club', 'band-full', 'concert-big', 'history-banner'];
+  $$('.archive__ph').forEach((el, i) => {
+    el.style.backgroundImage = `url(assets/${archiveImgs[i % archiveImgs.length]}.jpg)`;
+  });
 
   // build crowd (silhouette of dots that light up)
   const crowd = $('#crowd');

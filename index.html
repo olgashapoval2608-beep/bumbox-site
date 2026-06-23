@@ -189,9 +189,9 @@
           </div>
           <p class="scene__note">Усе почалося тут.</p>
           <div class="member-cards">
-            <span class="member-card"><i>👤</i>Андрій Хливнюк<small>вокал</small></span>
-            <span class="member-card"><i>👤</i>Андрій «Муха» Самойло<small>гітара</small></span>
-            <span class="member-card"><i>👤</i>Валентин Матіюк<small>DJ</small></span>
+            <span class="member-card"><img class="mc__img" src="assets/portrait-khlivniuk.jpg" alt="Андрій Хливнюк" onerror="this.classList.add('img-missing')"><i>👤</i>Андрій Хливнюк<small>вокал</small></span>
+            <span class="member-card"><img class="mc__img" src="assets/portrait-samoylo.jpg" alt="Андрій Самойло" onerror="this.classList.add('img-missing')"><i>👤</i>Андрій «Муха» Самойло<small>гітара</small></span>
+            <span class="member-card"><img class="mc__img" src="assets/portrait-matiyuk.jpg" alt="Валентин Матіюк" onerror="this.classList.add('img-missing')"><i>👤</i>Валентин Матіюк<small>DJ</small></span>
           </div>
         </div>
       </article>
@@ -199,8 +199,8 @@
       <!-- 2005–2007 -->
       <article class="doc-scene doc-scene--rev reveal">
         <figure class="scene__media">
-          <img src="assets/family-biznes-cover.jpg" alt="Бумбокс — Family Бізнес (2007)" onerror="this.classList.add('img-missing')">
-          <span class="scene__ph">assets/family-biznes-cover.jpg</span>
+          <img src="assets/album-family-biznes.jpg" alt="Бумбокс — Family Бізнес (2007)" onerror="this.classList.add('img-missing')">
+          <span class="scene__ph">assets/album-family-biznes.jpg</span>
           <figcaption>family бізнес · 2007</figcaption>
         </figure>
         <div class="scene__body">
@@ -225,20 +225,20 @@
           <p>Нові альбоми, великі тури країною та за кордоном, розширення складу — від тріо до повноцінного концертного бенду.</p>
         </div>
         <div class="lineup">
-          <span class="member-card"><i>👤</i>Андрій Хливнюк<small>вокал</small></span>
-          <span class="member-card"><i>👤</i>Андрій Самойло<small>гітара</small></span>
-          <span class="member-card"><i>👤</i>Валентин Матіюк<small>DJ</small></span>
-          <span class="member-card"><i>👤</i>Олександр Люлякін<small>ударні</small></span>
-          <span class="member-card"><i>👤</i>Денис Левченко<small>бас</small></span>
-          <span class="member-card"><i>👤</i>Павло Литвиненко<small>клавішні</small></span>
+          <span class="member-card"><img class="mc__img" src="assets/portrait-khlivniuk.jpg" alt="Андрій Хливнюк" onerror="this.classList.add('img-missing')"><i>👤</i>Андрій Хливнюк<small>вокал</small></span>
+          <span class="member-card"><img class="mc__img" src="assets/portrait-samoylo.jpg" alt="Андрій Самойло" onerror="this.classList.add('img-missing')"><i>👤</i>Андрій Самойло<small>гітара</small></span>
+          <span class="member-card"><img class="mc__img" src="assets/portrait-matiyuk.jpg" alt="Валентин Матіюк" onerror="this.classList.add('img-missing')"><i>👤</i>Валентин Матіюк<small>DJ</small></span>
+          <span class="member-card"><img class="mc__img" src="assets/portrait-liuliakin.jpg" alt="Олександр Люлякін" onerror="this.classList.add('img-missing')"><i>👤</i>Олександр Люлякін<small>ударні</small></span>
+          <span class="member-card"><img class="mc__img" src="assets/portrait-levchenko.jpg" alt="Денис Левченко" onerror="this.classList.add('img-missing')"><i>👤</i>Денис Левченко<small>бас</small></span>
+          <span class="member-card"><img class="mc__img" src="assets/portrait-lytvynenko.jpg" alt="Павло Литвиненко" onerror="this.classList.add('img-missing')"><i>👤</i>Павло Литвиненко<small>клавішні</small></span>
         </div>
       </article>
 
       <!-- 2018 -->
       <article class="doc-scene doc-scene--rev reveal">
         <figure class="scene__media scene__media--leaving">
-          <img src="assets/history-samoylo.jpg" alt="Андрій «Муха» Самойло" onerror="this.classList.add('img-missing')">
-          <span class="scene__ph">assets/history-samoylo.jpg</span>
+          <img src="assets/portrait-samoylo.jpg" alt="Андрій «Муха» Самойло" onerror="this.classList.add('img-missing')">
+          <span class="scene__ph">assets/portrait-samoylo.jpg</span>
           <figcaption>Андрій «Муха» Самойло</figcaption>
         </figure>
         <div class="scene__body">
@@ -298,11 +298,10 @@
     <div class="albums__scroller" id="albumScroller">
       <div class="albums__sticky">
         <div class="albums__track" id="albumTrack">
-          <!-- TODO: замінити обкладинки та уточнити дискографію реальними даними/файлами -->
           <article class="album" data-mood="warm" style="--cv1:#d97a34;--cv2:#3a1d10">
             <div class="album__cover">
               <span class="album__vinyl"></span>
-              <div class="album__art"><span class="album__art-title">Меломанія</span></div>
+              <div class="album__art"><img class="album__img" src="assets/album-melomania.jpg" alt="Меломанія" onerror="this.remove()"><span class="album__art-title">Меломанія</span></div>
             </div>
             <div class="album__info">
               <p class="track-tag">LP 01</p>
@@ -310,7 +309,7 @@
               <p class="album__year">2005</p>
               <p class="album__desc">«Альбом, який зробив Бумбокс голосом нового покоління.»</p>
               <p class="album__phrase">Пісні про місто.</p>
-              <p class="album__stat"><b>50+</b> млн прослуховувань</p>
+              <p class="album__stat"><b>2005</b> дебют</p>
               <button class="btn btn--ghost album__open" data-cursor="▶">▶ Відкрити альбом</button>
             </div>
           </article>
@@ -318,12 +317,12 @@
           <article class="album" data-mood="red" style="--cv1:#e23b2e;--cv2:#2a0c0a">
             <div class="album__cover">
               <span class="album__vinyl"></span>
-              <div class="album__art"><img class="album__img" src="assets/family-biznes-cover.jpg" alt="Family Бізнес" onerror="this.remove()"><span class="album__art-title">Family<br>Бізнес</span></div>
+              <div class="album__art"><img class="album__img" src="assets/album-family-biznes.jpg" alt="Family Бізнес" onerror="this.remove()"><span class="album__art-title">Family<br>Бізнес</span></div>
             </div>
             <div class="album__info">
               <p class="track-tag">LP 02</p>
               <h3>Family Бізнес</h3>
-              <p class="album__year">2007</p>
+              <p class="album__year">2006</p>
               <p class="album__desc">«Звук, що став своїм у кожній квартирі та кожній машині.»</p>
               <p class="album__phrase">Пісні про своїх.</p>
               <p class="album__stat"><b>ТОП</b> ротацій епохи</p>
@@ -334,15 +333,15 @@
           <article class="album" data-mood="cold" style="--cv1:#4a78b0;--cv2:#0b1a2a">
             <div class="album__cover">
               <span class="album__vinyl"></span>
-              <div class="album__art"><span class="album__art-title">Всё<br>включено</span></div>
+              <div class="album__art"><img class="album__img" src="assets/album-iii.jpg" alt="III" onerror="this.remove()"><span class="album__art-title">III</span></div>
             </div>
             <div class="album__info">
               <p class="track-tag">LP 03</p>
-              <h3>Всё включено</h3>
+              <h3>III</h3>
               <p class="album__year">2008</p>
-              <p class="album__desc">«Дорога, ніч і фари — альбом про рух уперед.»</p>
-              <p class="album__phrase">Пісні про дорогу.</p>
-              <p class="album__stat"><b>∞</b> кілометрів</p>
+              <p class="album__desc">«Третій студійний — зрілість і пошук свого.»</p>
+              <p class="album__phrase">Пісні про себе.</p>
+              <p class="album__stat"><b>III</b></p>
               <button class="btn btn--ghost album__open" data-cursor="▶">▶ Відкрити альбом</button>
             </div>
           </article>
@@ -350,15 +349,79 @@
           <article class="album" data-mood="yellow" style="--cv1:#f5c518;--cv2:#2a2207">
             <div class="album__cover">
               <span class="album__vinyl"></span>
-              <div class="album__art"><span class="album__art-title">20<br>років</span></div>
+              <div class="album__art"><img class="album__img" src="assets/album-vse-vkliucheno.jpg" alt="Всё включено" onerror="this.remove()"><span class="album__art-title">Всё<br>включено</span></div>
             </div>
             <div class="album__info">
-              <p class="track-tag">ANTHOLOGY</p>
-              <h3>20 років</h3>
-              <p class="album__year">2024</p>
-              <p class="album__desc">«Усе найголовніше — від першого запису до сьогодні.»</p>
-              <p class="album__phrase">Пісні про свободу.</p>
-              <p class="album__stat"><b>20</b> років разом</p>
+              <p class="track-tag">LP 04</p>
+              <h3>Всё включено</h3>
+              <p class="album__year">2010</p>
+              <p class="album__desc">«Живий звук великої сцени.»</p>
+              <p class="album__phrase">Пісні про дорогу.</p>
+              <p class="album__stat"><b>LIVE</b></p>
+              <button class="btn btn--ghost album__open" data-cursor="▶">▶ Відкрити альбом</button>
+            </div>
+          </article>
+
+          <article class="album" data-mood="warm" style="--cv1:#c98b46;--cv2:#241608">
+            <div class="album__cover">
+              <span class="album__vinyl"></span>
+              <div class="album__art"><img class="album__img" src="assets/album-serednii-vik.jpg" alt="Середній вік" onerror="this.remove()"><span class="album__art-title">Середній<br>вік</span></div>
+            </div>
+            <div class="album__info">
+              <p class="track-tag">LP 05</p>
+              <h3>Середній вік</h3>
+              <p class="album__year">2011</p>
+              <p class="album__desc">«Чесна розмова з часом і собою.»</p>
+              <p class="album__phrase">Пісні про дорослішання.</p>
+              <p class="album__stat"><b>2011</b></p>
+              <button class="btn btn--ghost album__open" data-cursor="▶">▶ Відкрити альбом</button>
+            </div>
+          </article>
+
+          <article class="album" data-mood="cold" style="--cv1:#5a6b80;--cv2:#10161e">
+            <div class="album__cover">
+              <span class="album__vinyl"></span>
+              <div class="album__art"><img class="album__img" src="assets/album-terminal-b.jpg" alt="Термінал Б" onerror="this.remove()"><span class="album__art-title">Термінал<br>Б</span></div>
+            </div>
+            <div class="album__info">
+              <p class="track-tag">LP 06</p>
+              <h3>Термінал Б</h3>
+              <p class="album__year">2013</p>
+              <p class="album__desc">«Між містами, дорогами й аеропортами.»</p>
+              <p class="album__phrase">Пісні про рух.</p>
+              <p class="album__stat"><b>2013</b></p>
+              <button class="btn btn--ghost album__open" data-cursor="▶">▶ Відкрити альбом</button>
+            </div>
+          </article>
+
+          <article class="album" data-mood="red" style="--cv1:#e23b2e;--cv2:#240a08">
+            <div class="album__cover">
+              <span class="album__vinyl"></span>
+              <div class="album__art"><img class="album__img" src="assets/album-holyi-korol.jpg" alt="Голий король" onerror="this.remove()"><span class="album__art-title">Голий<br>король</span></div>
+            </div>
+            <div class="album__info">
+              <p class="track-tag">LP 07</p>
+              <h3>Голий король</h3>
+              <p class="album__year">2017</p>
+              <p class="album__desc">«Гостро, відверто, без масок.»</p>
+              <p class="album__phrase">Пісні про правду.</p>
+              <p class="album__stat"><b>2017</b></p>
+              <button class="btn btn--ghost album__open" data-cursor="▶">▶ Відкрити альбом</button>
+            </div>
+          </article>
+
+          <article class="album" data-mood="yellow" style="--cv1:#f5c518;--cv2:#2a2207">
+            <div class="album__cover">
+              <span class="album__vinyl"></span>
+              <div class="album__art"><img class="album__img" src="assets/album-rubikon.jpg" alt="Таємний код: Рубікон" onerror="this.remove()"><span class="album__art-title">Рубікон</span></div>
+            </div>
+            <div class="album__info">
+              <p class="track-tag">LP 08</p>
+              <h3>Таємний код: Рубікон</h3>
+              <p class="album__year">2019</p>
+              <p class="album__desc">«Точка неповернення — новий розділ звуку.»</p>
+              <p class="album__phrase">Пісні про вибір.</p>
+              <p class="album__stat"><b>2019</b></p>
               <button class="btn btn--ghost album__open" data-cursor="▶">▶ Відкрити альбом</button>
             </div>
           </article>

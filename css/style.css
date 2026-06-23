@@ -436,6 +436,10 @@ b{font-weight:600;color:var(--cream)}
 .member-card:hover{border-color:var(--yellow);transform:translateY(-3px)}
 .member-card i{font-style:normal;font-size:1.1rem;margin-bottom:.2rem}
 .member-card small{color:var(--muted);font-family:var(--font-mono);font-size:.58rem;letter-spacing:.18em;text-transform:uppercase}
+.mc__img{width:46px;height:46px;border-radius:50%;object-fit:cover;margin-bottom:.4rem;
+  filter:grayscale(.3) contrast(1.05);border:1px solid #3a342c}
+.mc__img.img-missing{display:none}
+.member-card .mc__img:not(.img-missing)+i{display:none}
 
 /* stat block */
 .stat-block{display:flex;gap:1.8rem;margin:1.4rem 0 .4rem;flex-wrap:wrap}
@@ -509,7 +513,7 @@ b{font-weight:600;color:var(--cream)}
 .albums__title{margin:1rem 0}
 
 /* sticky horizontal scroller */
-.albums__scroller{height:340vh;position:relative}
+.albums__scroller{height:620vh;position:relative}
 .albums__sticky{position:sticky;top:0;height:100vh;display:flex;flex-direction:column;
   align-items:flex-start;justify-content:center;overflow:hidden}
 .albums__track{display:flex;gap:6vw;align-items:center;will-change:transform;padding-inline:50vw}
@@ -577,9 +581,8 @@ b{font-weight:600;color:var(--cream)}
   background:rgba(10,10,10,.92);border:1px solid var(--yellow);border-radius:6px;padding:1rem 1.1rem;
   opacity:0;transform:translateY(8px);transition:.25s var(--ease);backdrop-filter:blur(4px);overflow:hidden}
 .map__card.show{opacity:1;transform:none}
-.map__card-flash{position:absolute;inset:0;z-index:-1;opacity:0;
-  background:radial-gradient(circle at 50% 30%,rgba(245,197,24,.35),transparent 60%),
-             linear-gradient(180deg,#3a2a14,#0a0a0a)}
+.map__card-flash{position:absolute;inset:0;z-index:-1;opacity:0;background-size:cover;background-position:center;
+  background-image:linear-gradient(180deg,rgba(10,10,10,.45),rgba(10,10,10,.8)),url("assets/concert-big.jpg")}
 .map__card.show .map__card-flash{animation:flash 1s ease}
 @keyframes flash{0%{opacity:.9}100%{opacity:0}}
 .map__card-pin{font-family:var(--font-display);font-size:1.4rem}
@@ -672,9 +675,13 @@ b{font-weight:600;color:var(--cream)}
   -webkit-mask:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);
   mask:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
 .archive__row{display:flex;gap:1.2rem;width:max-content;animation:marquee 28s linear infinite}
-.archive__ph{flex:none;width:200px;height:130px;border-radius:4px;display:grid;place-items:center;
-  font-family:var(--font-mono);font-size:.66rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);
-  background:linear-gradient(135deg,#1c1814,#0c0a08);border:1px solid #2a2520;filter:grayscale(.5)}
+.archive__ph{flex:none;width:200px;height:130px;border-radius:4px;display:grid;place-items:end center;
+  font-family:var(--font-mono);font-size:.66rem;letter-spacing:.2em;text-transform:uppercase;color:var(--cream);
+  background:linear-gradient(135deg,#1c1814,#0c0a08);background-size:cover;background-position:center;
+  border:1px solid #2a2520;filter:grayscale(.4);position:relative;isolation:isolate;
+  padding-bottom:.5rem;text-shadow:0 1px 4px #000}
+.archive__ph::after{content:'';position:absolute;inset:0;border-radius:4px;z-index:-1;
+  background:linear-gradient(180deg,transparent 35%,rgba(0,0,0,.72))}
 @keyframes marquee{to{transform:translateX(-50%)}}
 
 /* =================================================================
