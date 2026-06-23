@@ -130,55 +130,158 @@
     </div>
   </header>
 
-  <!-- ============ 2. HISTORY ============ -->
+  <!-- ============ 2. HISTORY — documentary ============ -->
   <section id="history" class="history section" data-track="01">
     <div class="history__bg" aria-hidden="true"></div>
 
-    <div class="container history__grid">
-      <div class="history__head reveal">
-        <p class="track-tag">TRACK 01 / ІСТОРІЯ</p>
-        <h2 class="display-h">2004 — Київ</h2>
-      </div>
+    <div class="container history__head reveal">
+      <p class="track-tag">TRACK 01 / ІСТОРІЯ</p>
+      <h2 class="display-h">2004 — Київ</h2>
+      <p class="lead-p">Усе почалось у Києві. З трьох людей, звуку і бажання робити музику по-своєму.</p>
 
-      <div class="history__text reveal">
-        <p class="lead-p">Усе почалось у Києві. З трьох людей, звуку і бажання робити музику по-своєму.</p>
-        <p>Бумбокс народився не як проєкт «під ринок», а як експеримент музикантів, які хотіли змішати живий ґрув, хіп-хоп, рок і чесну лірику. Звідси — звук, який неможливо сплутати.</p>
-        <p class="muted">Гурт заснували у 2004 році в Києві <b>Андрій Хливнюк</b>, <b>Андрій «Муха» Самойло</b> та <b>Валентин «Валік» Матіюк</b>.</p>
-
-        <!-- mini audio player -->
-        <div class="miniplayer" id="miniplayer">
-          <button class="miniplayer__btn" aria-label="Play history">▶</button>
-          <div class="miniplayer__meta">
-            <span class="miniplayer__title">TRACK 01 / HISTORY</span>
-            <div class="miniplayer__bar"><span id="historyProgress"></span></div>
-            <span class="miniplayer__time"><b id="historyTime">00:04</b> / 20:00</span>
-          </div>
+      <!-- mini audio player (таймер біжить при скролі) -->
+      <div class="miniplayer" id="miniplayer">
+        <button class="miniplayer__btn" aria-label="Play history">▶</button>
+        <div class="miniplayer__meta">
+          <span class="miniplayer__title">TRACK 01 / HISTORY</span>
+          <div class="miniplayer__bar"><span id="historyProgress"></span></div>
+          <span class="miniplayer__time"><b id="historyTime">00:04</b> / 20:00</span>
         </div>
       </div>
-
-      <!-- layered band photo (parallax on mouse move) -->
-      <figure class="bandphoto reveal" id="bandphoto" aria-label="Фото гурту (заглушка — додайте справжнє фото)">
-        <span class="bandphoto__layer bandphoto__layer--crowd" data-depth="6"></span>
-        <span class="bandphoto__layer bandphoto__layer--stage" data-depth="14"></span>
-        <span class="bandphoto__layer bandphoto__layer--band"  data-depth="26">
-          <span class="silhouette"></span><span class="silhouette"></span><span class="silhouette"></span>
-        </span>
-        <span class="bandphoto__layer bandphoto__layer--tape"  data-depth="40"></span>
-        <figcaption>backstage · Київ · 2004</figcaption>
-      </figure>
     </div>
 
-    <!-- cassette-tape timeline -->
+    <!-- касетна стрічка з Hero стає таймлайном -->
     <div class="timeline container reveal">
       <span class="timeline__tape" aria-hidden="true"></span>
       <ol class="timeline__list">
-        <li><b>2004</b><span>створення гурту</span></li>
+        <li><b>2004</b><span>створення</span></li>
         <li><b>2005</b><span>перші записи</span></li>
-        <li><b>2006</b><span>перші концерти</span></li>
-        <li><b>2008</b><span>альбоми</span></li>
-        <li><b>2015</b><span>великі тури</span></li>
+        <li><b>2007</b><span>перші хіти</span></li>
+        <li><b>2013</b><span>великі сцени</span></li>
+        <li><b>2019</b><span>новий склад</span></li>
         <li><b>∞</b><span>сьогодні</span></li>
       </ol>
+    </div>
+
+    <!-- documentary scenes -->
+    <div class="doc container">
+
+      <!-- 2004 -->
+      <article class="doc-scene reveal">
+        <figure class="bandphoto" id="bandphoto" aria-label="Бумбокс — Хливнюк, Самойло, Матіюк, 2004">
+          <span class="bandphoto__layer bandphoto__layer--crowd" data-depth="6"></span>
+          <span class="bandphoto__layer bandphoto__layer--stage" data-depth="14"></span>
+          <span class="bandphoto__layer bandphoto__layer--band" data-depth="26">
+            <img src="assets/history-2004-trio.jpg" alt="Хливнюк, Самойло, Матіюк — 2004" onerror="this.classList.add('img-missing')">
+            <span class="scene__ph">assets/history-2004-trio.jpg</span>
+          </span>
+          <span class="bandphoto__layer bandphoto__layer--tape" data-depth="40"></span>
+          <figcaption>Київ · 2004</figcaption>
+        </figure>
+        <div class="scene__body">
+          <span class="scene__chip">▶ 2004</span>
+          <h3 class="scene__title">Народження Бумбоксу</h3>
+          <p>Бумбокс народився не як проєкт «під ринок», а як експеримент музикантів, які хотіли змішати живий ґрув, хіп-хоп, рок і чесну лірику. Звідси — звук, який неможливо сплутати.</p>
+          <div class="stat-block">
+            <div><b>3</b><span>учасники</span></div>
+            <div><b>1</b><span>репетиційна кімната</span></div>
+            <div><b>0</b><span>продюсерів</span></div>
+          </div>
+          <p class="scene__note">Усе почалося тут.</p>
+          <div class="member-cards">
+            <span class="member-card"><i>👤</i>Андрій Хливнюк<small>вокал</small></span>
+            <span class="member-card"><i>👤</i>Андрій «Муха» Самойло<small>гітара</small></span>
+            <span class="member-card"><i>👤</i>Валентин Матіюк<small>DJ</small></span>
+          </div>
+        </div>
+      </article>
+
+      <!-- 2005–2007 -->
+      <article class="doc-scene doc-scene--rev reveal">
+        <figure class="scene__media">
+          <img src="assets/family-biznes-cover.jpg" alt="Бумбокс — Family Бізнес (2007)" onerror="this.classList.add('img-missing')">
+          <span class="scene__ph">assets/family-biznes-cover.jpg</span>
+          <figcaption>family бізнес · 2007</figcaption>
+        </figure>
+        <div class="scene__body">
+          <span class="scene__chip">▶ 2005–2007</span>
+          <h3 class="scene__title">Перші хіти</h3>
+          <p>Голос нового покоління: міські історії, чесні тексти й ґрув, що звучав із кожного двору, авто та навушників.</p>
+          <div class="track-list">
+            <span class="lp">📀 Меломанія — 2005</span>
+            <span class="lp">📀 Family Бізнес — 2007</span>
+            <span class="song">🎵 Вахтерам</span>
+            <span class="song">🎵 E-mail</span>
+            <span class="song">🎵 Квіти у волоссі</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- 2008–2013 -->
+      <article class="doc-scene doc-scene--wide reveal">
+        <div class="scene__body scene__body--center">
+          <span class="scene__chip">▶ 2008–2013</span>
+          <h3 class="scene__title">Гурт підкорює великі сцени</h3>
+          <p>Нові альбоми, великі тури країною та за кордоном, розширення складу — від тріо до повноцінного концертного бенду.</p>
+        </div>
+        <div class="lineup">
+          <span class="member-card"><i>👤</i>Андрій Хливнюк<small>вокал</small></span>
+          <span class="member-card"><i>👤</i>Андрій Самойло<small>гітара</small></span>
+          <span class="member-card"><i>👤</i>Валентин Матіюк<small>DJ</small></span>
+          <span class="member-card"><i>👤</i>Олександр Люлякін<small>ударні</small></span>
+          <span class="member-card"><i>👤</i>Денис Левченко<small>бас</small></span>
+          <span class="member-card"><i>👤</i>Павло Литвиненко<small>клавішні</small></span>
+        </div>
+      </article>
+
+      <!-- 2018 -->
+      <article class="doc-scene doc-scene--rev reveal">
+        <figure class="scene__media scene__media--leaving">
+          <img src="assets/history-samoylo.jpg" alt="Андрій «Муха» Самойло" onerror="this.classList.add('img-missing')">
+          <span class="scene__ph">assets/history-samoylo.jpg</span>
+          <figcaption>Андрій «Муха» Самойло</figcaption>
+        </figure>
+        <div class="scene__body">
+          <span class="scene__chip scene__chip--red">▶ 2018</span>
+          <h3 class="scene__title">Кінець цілої епохи</h3>
+          <p>Після майже 15 років у гурті <b>Андрій «Муха» Самойло</b> залишає Бумбокс. Завершується ціла епоха класичного складу.</p>
+        </div>
+      </article>
+
+      <!-- 2019 -->
+      <article class="doc-scene reveal">
+        <figure class="scene__media">
+          <span class="new-member">NEW MEMBER</span>
+          <img src="assets/history-inna.jpg" alt="Інна Невойт" onerror="this.classList.add('img-missing')">
+          <span class="scene__ph">assets/history-inna.jpg</span>
+          <figcaption>Інна Невойт</figcaption>
+        </figure>
+        <div class="scene__body">
+          <span class="scene__chip">▶ 2019</span>
+          <h3 class="scene__title">Новий розділ</h3>
+          <p>До складу приходить <b>Інна Невойт</b> — бас-гітара. Звук Бумбоксу відкриває нову сторінку.</p>
+        </div>
+      </article>
+
+      <!-- 2022 — today -->
+      <article class="doc-scene doc-scene--rev reveal">
+        <figure class="scene__media scene__media--tall">
+          <img src="assets/history-khlivniuk-army.jpg" alt="Андрій Хливнюк, 2022" onerror="this.classList.add('img-missing')">
+          <span class="scene__ph">assets/history-khlivniuk-army.jpg</span>
+          <figcaption>2022 — сьогодні</figcaption>
+        </figure>
+        <div class="scene__body">
+          <span class="scene__chip">▶ 2022 — ∞</span>
+          <h3 class="scene__title">Музика під час війни</h3>
+          <p>Благодійні тури, концерти підтримки та збори для України. Музика стає голосом і опорою — там, де вона потрібна найбільше.</p>
+        </div>
+      </article>
+    </div>
+
+    <!-- стрічка згортається в платівку → альбоми -->
+    <div class="tape-to-disc reveal" aria-hidden="true">
+      <span class="ttd-disc"></span>
+      <span class="ttd-text">стрічка згортається в платівку…</span>
     </div>
   </section>
 
@@ -215,7 +318,7 @@
           <article class="album" data-mood="red" style="--cv1:#e23b2e;--cv2:#2a0c0a">
             <div class="album__cover">
               <span class="album__vinyl"></span>
-              <div class="album__art"><span class="album__art-title">Family<br>Бізнес</span></div>
+              <div class="album__art"><img class="album__img" src="assets/family-biznes-cover.jpg" alt="Family Бізнес" onerror="this.remove()"><span class="album__art-title">Family<br>Бізнес</span></div>
             </div>
             <div class="album__info">
               <p class="track-tag">LP 02</p>
