@@ -65,6 +65,19 @@
     <div class="hero__inner">
       <div class="hero__spot" aria-hidden="true"></div>
       <div class="hero-photo" aria-hidden="true"></div>
+      <div class="hero-intro" id="heroIntro">
+        <p class="track-tag">TRACK 01 / ІСТОРІЯ</p>
+        <h2 class="display-h">2004 — Київ</h2>
+        <p class="lead-p">Усе почалось у Києві. З трьох людей, звуку і бажання робити музику по-своєму.</p>
+        <div class="miniplayer" id="miniplayer">
+          <button class="miniplayer__btn" aria-label="Play history">▶</button>
+          <div class="miniplayer__meta">
+            <span class="miniplayer__title">TRACK 01 / HISTORY</span>
+            <div class="miniplayer__bar"><span id="historyProgress"></span></div>
+            <span class="miniplayer__time"><b id="historyTime">00:04</b> / 20:00</span>
+          </div>
+        </div>
+      </div>
 
       <p class="hero__eyebrow">КИЇВ · 2004 — ∞</p>
 
@@ -139,27 +152,8 @@
   </header>
 
   <!-- ============ 2. HISTORY — documentary ============ -->
-  <section id="history" class="history section" data-track="01">
+  <section id="history" class="history section" data-track="01" aria-label="Історія">
     <div class="history__bg" aria-hidden="true"></div>
-
-    <header class="history__banner reveal">
-      <div class="history__banner-photo" aria-hidden="true"></div>
-      <div class="container history__head">
-        <p class="track-tag">TRACK 01 / ІСТОРІЯ</p>
-        <h2 class="display-h">2004 — Київ</h2>
-        <p class="lead-p">Усе почалось у Києві. З трьох людей, звуку і бажання робити музику по-своєму.</p>
-
-        <!-- mini audio player (таймер біжить при скролі) -->
-        <div class="miniplayer" id="miniplayer">
-          <button class="miniplayer__btn" aria-label="Play history">▶</button>
-          <div class="miniplayer__meta">
-            <span class="miniplayer__title">TRACK 01 / HISTORY</span>
-            <div class="miniplayer__bar"><span id="historyProgress"></span></div>
-            <span class="miniplayer__time"><b id="historyTime">00:04</b> / 20:00</span>
-          </div>
-        </div>
-      </div>
-    </header>
 
     <!-- касетна стрічка з Hero стає таймлайном -->
     <div class="timeline container reveal">

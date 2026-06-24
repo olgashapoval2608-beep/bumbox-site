@@ -399,36 +399,42 @@
   const REST_T = 'perspective(1400px) rotateX(6deg) rotateY(-7deg)';
 
   const heroPhoto = $('.hero-photo');
+  const heroIntro = $('#heroIntro');
 
-  function resetHeroCopy() {
+  function resetHero() {
     heroCopy.forEach((el) => el.style.removeProperty('opacity'));
     if (scrollCue) scrollCue.style.removeProperty('opacity');
-    if (cassettePhoto) cassettePhoto.style.opacity = '';
     if (heroPhoto) { heroPhoto.style.opacity = '0'; heroPhoto.style.transform = ''; }
+    if (heroIntro) heroIntro.style.opacity = '0';
     if (bbTakeover) boombox.style.opacity = '1';
   }
 
   function updateHeroZoom() {
     if (!heroZone || !boombox) return;
-    if (reduceMotion || innerWidth <= 720) { if (bbTakeover) boombox.style.transform = REST_T; resetHeroCopy(); return; }
+    if (reduceMotion || innerWidth <= 720) { if (bbTakeover) boombox.style.transform = REST_T; resetHero(); return; }
     if (boombox.classList.contains('playing')) return;     // PLAY handles its own transition
     const total = heroZone.offsetHeight - innerHeight;
     const p = total > 0 ? Math.min(1, Math.max(0, scrollY / total)) : 0;
-    if (p <= 0.001) { if (bbTakeover) boombox.style.transform = REST_T; resetHeroCopy(); return; }
+    if (p <= 0.001) { if (bbTakeover) boombox.style.transform = REST_T; resetHero(); return; }
     if (!bbTakeover) { boombox.style.animation = 'none'; bbTakeover = true; }   // take over from the entrance animation
-    // boombox grows moderately toward the cassette, then fades as the photo takes over
+    // boombox grows a little, then fades as the photo takes over
     const k = Math.min(1, p * 2.5);                        // flatten the tilt early
-    boombox.style.transform = `perspective(${1400 + p * 5000}px) rotateX(${6 * (1 - k)}deg) rotateY(${-7 * (1 - k)}deg) scale(${1 + p * 1.7})`;
-    boombox.style.opacity = String(Math.max(0, 1 - Math.max(0, p - 0.5) / 0.32));
-    if (cassettePhoto) cassettePhoto.style.opacity = String(Math.min(1, p * 3));   // photo appears on the cassette
-    // crisp full-res photo blooms out of the cassette → fills the screen (TRACK 01)
+    boombox.style.transform = `perspective(${1400 + p * 4000}px) rotateX(${6 * (1 - k)}deg) rotateY(${-7 * (1 - k)}deg) scale(${1 + p * 1.4})`;
+    boombox.style.opacity = String(Math.max(0, 1 - p / 0.5));
+    // ONE photo grows continuously from cassette size → full screen (eased, no jump)
     if (heroPhoto) {
-      heroPhoto.style.transform = `scale(${0.12 + 0.88 * Math.min(1, p / 0.82)})`;
-      heroPhoto.style.opacity = String(Math.min(1, Math.max(0, p - 0.32) / 0.4));
+      const g = Math.min(1, p / 0.8);                      // constant-rate growth → full by 80% (gradual, no jump)
+      heroPhoto.style.transform = `scale(${0.1 + 0.9 * g})`;
+      heroPhoto.style.opacity = String(Math.min(1, p / 0.12));
     }
+    // TRACK 01 intro text appears once the photo fills the screen
+    if (heroIntro) heroIntro.style.opacity = String(Math.max(0, (p - 0.7) / 0.25));
     const op = String(Math.max(0, 1 - p * 5));             // !important beats the fadeUp entrance animation
     heroCopy.forEach((el) => el.style.setProperty('opacity', op, 'important'));
     if (scrollCue) scrollCue.style.setProperty('opacity', op, 'important');
+    // mini-player timer follows the zoom
+    if (hProgress) hProgress.style.width = (p * 100) + '%';
+    if (hTime) { const s = Math.floor(p * 150); hTime.textContent = `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`; }
   }
 
   /* =================================================================
@@ -442,16 +448,6 @@
       updateHeroZoom();
       updateHistoryTrack();
       updateAlbums();
-
-      // history mini-player progress
-      if (historySection && hProgress) {
-        const r = historySection.getBoundingClientRect();
-        const prog = Math.min(1, Math.max(0, (innerHeight - r.top) / (r.height + innerHeight)));
-        hProgress.style.width = (prog * 100) + '%';
-        const totalSec = 20 * 60;
-        const cur = Math.floor(prog * totalSec);
-        hTime.textContent = `${String(Math.floor(cur / 60)).padStart(2, '0')}:${String(cur % 60).padStart(2, '0')}`;
-      }
 
       // moments photo drift
       if (scatter && innerWidth > 720) {
