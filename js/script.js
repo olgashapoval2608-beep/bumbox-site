@@ -282,30 +282,55 @@
   const map = $('#tourMap');
   const card = $('#cityCard');
   if (map && card) {
+    const cardImg = $('#cardImg'), cardVideo = $('#cardVideo');
     let pinned = null;                                  // city pinned by tap/click (touch + click-to-keep)
+
+    function setMedia(city) {
+      const raw = city.dataset.media || '';
+      const sep = raw.indexOf(':');
+      const type = sep > 0 ? raw.slice(0, sep) : '';
+      const src = sep > 0 ? raw.slice(sep + 1) : '';
+      if (type === 'video' && src) {
+        if (cardVideo.getAttribute('src') !== src) cardVideo.setAttribute('src', src);
+        cardVideo.style.display = 'block'; cardImg.style.display = 'none';
+        const pr = cardVideo.play(); if (pr && pr.catch) pr.catch(() => {});
+      } else if (type === 'img' && src) {
+        if (cardImg.getAttribute('src') !== src) cardImg.setAttribute('src', src);
+        cardImg.style.display = 'block'; cardVideo.style.display = 'none'; cardVideo.pause();
+      } else {
+        cardImg.style.display = 'none'; cardVideo.style.display = 'none'; cardVideo.pause();
+      }
+    }
+
     const show = (city) => {
       $('#cardCity').textContent = city.dataset.city;
       $('#cardYear').textContent = city.dataset.year;
       $('#cardVenue').textContent = city.dataset.venue;
       $('#cardGuests').textContent = city.dataset.guests;
+      setMedia(city);
+      card.classList.add('show');                       // show first so it is measurable
+      // position with flip + clamp so the card is NEVER clipped by the map edges
       const mr = map.getBoundingClientRect();
       const cr = city.getBoundingClientRect();
-      let x = cr.left - mr.left + cr.width / 2;
-      let y = cr.top - mr.top - 12;
-      x = Math.min(mr.width - 110, Math.max(110, x));   // keep card inside the map
-      card.style.left = x + 'px';
-      card.style.top = y + 'px';
-      card.style.transform = 'translate(-50%,-100%)';
-      card.classList.add('show');
-      const flash = $('.map__card-flash');
-      flash.style.animation = 'none'; void flash.offsetWidth; flash.style.animation = '';   // restart flash
+      const px = cr.left - mr.left + cr.width / 2;       // pin x within the map
+      const pinTop = cr.top - mr.top;                    // pin top within the map
+      const cw = card.offsetWidth, ch = card.offsetHeight;
+      let top = pinTop - 16 - ch;                        // prefer above the pin
+      if (top < 8) top = pinTop + 24;                    // not enough room → flip below
+      top = Math.max(8, Math.min(mr.height - ch - 8, top));
+      let left = Math.max(8, Math.min(mr.width - cw - 8, px - cw / 2));
+      card.style.left = left + 'px';
+      card.style.top = top + 'px';
+      card.style.transform = 'none';
     };
-    const hide = () => { card.classList.remove('show'); pinned = null; };
+    const conceal = () => { card.classList.remove('show'); cardVideo.pause(); };
+    const hide = () => { conceal(); pinned = null; };
+
     $$('.city', map).forEach((city) => {
       city.addEventListener('mouseenter', () => { if (!pinned) show(city); });
-      city.addEventListener('mouseleave', () => { if (!pinned) card.classList.remove('show'); });
+      city.addEventListener('mouseleave', () => { if (!pinned) conceal(); });
       city.addEventListener('focus', () => show(city));
-      city.addEventListener('blur', () => { if (!pinned) card.classList.remove('show'); });
+      city.addEventListener('blur', () => { if (!pinned) conceal(); });
       // tap / click pins the card open (essential on touch, where there is no hover)
       city.addEventListener('click', (e) => {
         e.stopPropagation();

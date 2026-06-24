@@ -466,8 +466,12 @@ b{font-weight:600;color:var(--cream)}
 .doc-scene--rev .scene__media{order:2}
 .doc-scene--wide{grid-template-columns:1fr;gap:1.6rem;text-align:center;justify-items:center}
 .doc-scene .scene__media,.doc-scene .bandphoto{max-width:300px;max-height:52vh;width:100%;justify-self:center}
-.doc-scene .scene__media--video{max-width:440px;aspect-ratio:16/10}
-.scene__video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:2}
+/* scene videos — shown FULL (no crop), stacked in the media column */
+.scene__videos,.scene__stack{display:flex;flex-direction:column;gap:.8rem;
+  width:100%;max-width:360px;max-height:84vh;justify-self:center;align-self:center}
+.scene__video{display:block;width:100%;height:auto;border-radius:8px;border:1px solid #2a2724;
+  background:#000;box-shadow:0 18px 38px rgba(0,0,0,.5)}
+.scene__stack .scene__media{max-width:none;width:100%;max-height:48vh}   /* match video width; cap height so the scene fits the pin */
 .scene__body{max-width:46ch}
 .scene__body--center{max-width:62ch}
 .scene__body p{margin-bottom:1rem}
@@ -518,7 +522,7 @@ b{font-weight:600;color:var(--cream)}
 .member-card:hover{border-color:var(--yellow);transform:translateY(-3px);z-index:6}
 .member-card i{font-style:normal;font-size:1.1rem;margin-bottom:.2rem}
 .member-card small{color:var(--muted);font-family:var(--font-mono);font-size:.58rem;letter-spacing:.18em;text-transform:uppercase}
-.mc__img{width:54px;height:54px;border-radius:50%;object-fit:cover;margin-bottom:.4rem;
+.mc__img{width:54px;height:54px;border-radius:50%;object-fit:cover;object-position:50% 16%;margin-bottom:.4rem;
   filter:grayscale(.3) contrast(1.05);border:1px solid #3a342c;transform-origin:center bottom;
   transition:transform .35s var(--ease),box-shadow .35s var(--ease),border-color .35s var(--ease)}
 .mc__img.img-missing{display:none}
@@ -615,7 +619,7 @@ b{font-weight:600;color:var(--cream)}
   transform:scale(.68);opacity:.32;transition:transform .5s var(--ease),opacity .5s var(--ease)}
 .album.is-center{transform:scale(1);opacity:1}
 .album__cover{position:relative;aspect-ratio:1;max-width:250px;width:100%;justify-self:center}
-.album__art{position:absolute;inset:0;border-radius:4px;z-index:2;
+.album__art{position:absolute;inset:0;border-radius:4px;z-index:2;overflow:hidden;
   background:linear-gradient(150deg,var(--cv1),var(--cv2));
   display:grid;place-items:center;box-shadow:0 30px 60px rgba(0,0,0,.6);
   border:1px solid rgba(255,255,255,.08)}
@@ -649,43 +653,55 @@ b{font-weight:600;color:var(--cream)}
    ================================================================= */
 .tours{padding:16vh 0 12vh;background:linear-gradient(180deg,#05080d,#070707)}
 .tours__head{text-align:center;margin-bottom:6vh}
-.map{position:relative;width:min(1100px,94vw);margin:0 auto;aspect-ratio:1000/520;
-  border-radius:10px;border:1px solid #16202c;overflow:hidden;
+.map{position:relative;width:min(1080px,94vw);margin:0 auto;aspect-ratio:1000/778;
+  border-radius:12px;border:1px solid #16202c;overflow:hidden;
   background:
-    radial-gradient(60% 80% at 50% 50%,rgba(20,40,70,.5),transparent 70%),
-    radial-gradient(circle at 30% 30%,rgba(245,197,24,.05),transparent 40%),
-    #04070c;
-  box-shadow:inset 0 0 80px rgba(0,0,0,.8)}
-.map::before{content:'';position:absolute;inset:0;opacity:.4;
-  background-image:linear-gradient(rgba(80,130,180,.08) 1px,transparent 1px),
-                   linear-gradient(90deg,rgba(80,130,180,.08) 1px,transparent 1px);
-  background-size:44px 44px}
-.map__lines{position:absolute;inset:0;width:100%;height:100%}
-.route{fill:none;stroke:var(--yellow);stroke-width:1.5;opacity:.5;
-  stroke-dasharray:8 14;filter:drop-shadow(0 0 4px var(--yellow));animation:dash 6s linear infinite}
+    radial-gradient(80% 90% at 55% 45%,rgba(20,40,70,.45),transparent 75%),
+    radial-gradient(circle at 82% 78%,rgba(245,197,24,.04),transparent 45%),
+    #050a12;
+  box-shadow:inset 0 0 90px rgba(0,0,0,.85)}
+.map::before{content:'';position:absolute;inset:0;z-index:0;opacity:.35;
+  background-image:linear-gradient(rgba(80,130,180,.07) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(80,130,180,.07) 1px,transparent 1px);
+  background-size:54px 54px}
+.map__geo{position:absolute;inset:0;z-index:1;width:100%;height:100%}
+.map__land{fill:rgba(130,160,130,.16);stroke:rgba(245,197,24,.5);stroke-width:1.2;
+  stroke-linejoin:round;filter:drop-shadow(0 0 6px rgba(245,197,24,.22))}
+.route{fill:none;stroke:var(--yellow);stroke-width:2;opacity:.75;
+  stroke-dasharray:7 12;filter:drop-shadow(0 0 5px var(--yellow));animation:dash 6s linear infinite}
 @keyframes dash{to{stroke-dashoffset:-220}}
-.city{position:absolute;transform:translate(-50%,-50%);background:none;border:none;
-  font-family:var(--font-mono);font-size:.7rem;letter-spacing:.12em;color:var(--cream);
-  padding-top:18px;white-space:nowrap}
+.map__legend{position:absolute;top:.9rem;left:1.1rem;z-index:3;font-family:var(--font-mono);
+  font-size:.64rem;letter-spacing:.24em;text-transform:uppercase;color:var(--muted)}
+
+.city{position:absolute;transform:translate(-50%,-6px);background:none;border:none;z-index:4;
+  font-family:var(--font-mono);font-size:.72rem;letter-spacing:.1em;color:var(--cream);
+  padding-top:18px;white-space:nowrap;text-shadow:0 1px 5px #000,0 0 2px #000}
 .city::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);
   width:12px;height:12px;border-radius:50%;background:var(--yellow);
   box-shadow:0 0 0 0 rgba(245,197,24,.6);animation:cityPulse 2.6s ease-out infinite}
-@keyframes cityPulse{0%{box-shadow:0 0 0 0 rgba(245,197,24,.55)}100%{box-shadow:0 0 0 18px rgba(245,197,24,0)}}
-.city:hover{color:var(--yellow)}
+@keyframes cityPulse{0%{box-shadow:0 0 0 0 rgba(245,197,24,.55)}100%{box-shadow:0 0 0 16px rgba(245,197,24,0)}}
+.city:hover,.city:focus-visible{color:var(--yellow)}
 .city:hover::before{background:#fff}
+/* home city (Київ) — red accent pin */
+.city--home{color:#ffd2cd}
+.city--home::before{background:var(--red);animation:cityPulseRed 2.4s ease-out infinite}
+@keyframes cityPulseRed{0%{box-shadow:0 0 0 0 rgba(226,59,46,.6)}100%{box-shadow:0 0 0 18px rgba(226,59,46,0)}}
 
-.map__card{position:absolute;z-index:5;pointer-events:none;min-width:190px;
-  background:rgba(10,10,10,.92);border:1px solid var(--yellow);border-radius:6px;padding:1rem 1.1rem;
-  opacity:0;transform:translateY(8px);transition:.25s var(--ease);backdrop-filter:blur(4px);overflow:hidden}
+.map__card{position:absolute;z-index:6;pointer-events:none;width:230px;
+  background:rgba(10,10,10,.95);border:1px solid var(--yellow);border-radius:8px;padding:.7rem;
+  opacity:0;transform:translateY(8px);transition:opacity .22s var(--ease),transform .22s var(--ease);
+  backdrop-filter:blur(4px);box-shadow:0 18px 40px rgba(0,0,0,.7)}
 .map__card.show{opacity:1;transform:none}
-.map__card-flash{position:absolute;inset:0;z-index:-1;opacity:0;background-size:cover;background-position:center;
-  background-image:linear-gradient(180deg,rgba(10,10,10,.45),rgba(10,10,10,.8)),url("../assets/concert-big.jpg")}
-.map__card.show .map__card-flash{animation:flash 1s ease}
-@keyframes flash{0%{opacity:.9}100%{opacity:0}}
-.map__card-pin{font-family:var(--font-display);font-size:1.4rem}
-.map__card-year{font-family:var(--font-mono);color:var(--yellow);font-size:.72rem;letter-spacing:.2em}
+.map__card-media{position:relative;width:100%;height:118px;border-radius:5px;overflow:hidden;
+  margin-bottom:.55rem;background:#15130f}
+.map__card-img,.map__card-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.map__card-media::after{content:'';position:absolute;inset:0;
+  background:linear-gradient(180deg,transparent 45%,rgba(8,8,8,.55))}
+.map__card-body{padding:0 .25rem .15rem}
+.map__card-pin{font-family:var(--font-display);font-size:1.5rem;line-height:1}
+.map__card-year{font-family:var(--font-mono);color:var(--yellow);font-size:.72rem;letter-spacing:.18em;margin-top:.15rem}
 .map__card-venue{margin-top:.3rem}
-.map__card-guests{color:var(--muted);font-size:.85rem;margin-bottom:.7rem}
+.map__card-guests{color:var(--muted);font-size:.82rem;margin-bottom:.7rem}
 
 /* posters */
 .posters{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.6rem;margin-top:10vh}
@@ -798,11 +814,17 @@ b{font-weight:600;color:var(--cream)}
 .photo.live::before{content:'● REC';position:absolute;top:6px;left:6px;font-family:var(--font-mono);
   font-size:.5rem;color:var(--red);letter-spacing:.1em}
 
-.moments__quote{text-align:center;font-family:var(--font-display);
+/* «заставка» video backdrop behind the quote + finale */
+.moments__feature{position:relative;isolation:isolate}
+.moments__bg{position:absolute;inset:0;z-index:0;width:100%;height:100%;object-fit:cover;
+  opacity:.3;filter:grayscale(.2)}
+.moments__feature::after{content:'';position:absolute;inset:0;z-index:0;pointer-events:none;
+  background:linear-gradient(180deg,#050505,rgba(5,5,5,.5) 16%,rgba(5,5,5,.5) 62%,#050505)}
+.moments__quote{position:relative;z-index:1;text-align:center;font-family:var(--font-display);
   font-size:clamp(1.6rem,4.5vw,3.4rem);line-height:1.05;color:var(--cream);
-  max-width:18ch;margin:8vh auto;text-transform:uppercase}
+  max-width:18ch;margin:0 auto;padding:14vh 1rem;text-transform:uppercase}
 
-.moments__finale{position:relative;height:120vh}
+.moments__finale{position:relative;z-index:1;height:120vh}
 .crowd{position:sticky;top:0;height:100vh;display:flex;flex-wrap:wrap;align-content:flex-end;
   justify-content:center;gap:4px 7px;padding:30vh 3vw 0;overflow:hidden;
   -webkit-mask:linear-gradient(180deg,transparent 8%,#000 45%);
@@ -880,11 +902,18 @@ b{font-weight:600;color:var(--cream)}
   .doc-track{flex-direction:column;padding-inline:0;gap:8vh;transform:none !important}
   .doc-scene{flex-basis:auto;width:auto}
   .doc-hint,.doc-progress{display:none}
-  /* tour map: taller + larger, finger-friendly city pins */
-  .map{aspect-ratio:auto;height:70vh}
-  .city{font-size:.82rem;padding:22px .5em .4em;min-height:44px}
-  .city::before{width:16px;height:16px}
-  .map__card{min-width:170px}
+  /* tour map: keep Europe undistorted; finger-friendly city pins */
+  .map{width:96vw}
+  .city{font-size:.74rem;padding:20px .4em .3em;min-height:44px}
+  .city::before{width:15px;height:15px}
+  /* compact card so it always fits inside the small mobile map */
+  .map__card{width:168px;padding:.5rem}
+  .map__card-media{height:66px;margin-bottom:.4rem}
+  .map__card-pin{font-size:1.2rem}
+  .map__card-year{font-size:.64rem}
+  .map__card-venue{font-size:.82rem;margin-top:.2rem}
+  .map__card-guests{font-size:.72rem;margin-bottom:.45rem}
+  .map__card .btn--mini{padding:.4em .9em;font-size:.64rem}
 }
 
 /* reduced motion — no scroll-jacking, stacked static layout */
