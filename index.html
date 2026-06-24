@@ -16,6 +16,9 @@
 </head>
 <body class="is-loading">
 
+  <!-- Skip to content (keyboard / screen-reader) -->
+  <a href="#hero" class="skip-link">Перейти до вмісту</a>
+
   <!-- Cinematic intro: black → noise → reveal -->
   <div class="intro" aria-hidden="true"></div>
 
@@ -45,11 +48,8 @@
   </div>
 
   <!-- ============ FIXED TOP NAV ============ -->
-  <nav class="topnav" id="topnav" aria-label="Навігація">
+  <nav class="topnav" id="topnav" aria-label="Головна навігація">
     <a href="#hero" class="topnav__logo" data-cursor="▶">БУМБОКС</a>
-    <button class="topnav__burger" id="navBurger" aria-label="Меню" aria-expanded="false">
-      <span></span><span></span><span></span>
-    </button>
     <ul class="topnav__list" id="navList">
       <li><a href="#hero"    class="topnav__item is-active"><b>00</b><span>Hero</span></a></li>
       <li><a href="#history" class="topnav__item"><b>01</b><span>Історія</span></a></li>
@@ -58,14 +58,20 @@
       <li><a href="#merch"   class="topnav__item"><b>04</b><span>Мерч</span></a></li>
       <li><a href="#footer"  class="topnav__item"><b>05</b><span>Контакти</span></a></li>
     </ul>
+    <div class="topnav__actions">
+      <a href="#tours" class="topnav__cta" data-cursor="🎫">🎫 Квитки</a>
+      <button class="topnav__burger" id="navBurger" aria-label="Відкрити меню" aria-controls="navList" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
   </nav>
 
   <!-- ============ 1. HERO ============ -->
-  <header id="hero" class="hero section">
+  <header id="hero" class="hero section" tabindex="-1">
     <div class="hero__inner">
       <div class="hero__spot" aria-hidden="true"></div>
       <div class="hero-photo" aria-hidden="true"></div>
-      <div class="hero-intro" id="heroIntro">
+      <div class="hero-intro" id="heroIntro" aria-hidden="true">
         <p class="track-tag">TRACK 01 / ІСТОРІЯ</p>
         <h2 class="display-h">2004 — Київ</h2>
         <p class="lead-p">Усе почалось у Києві. З трьох людей, звуку і бажання робити музику по-своєму.</p>
@@ -108,12 +114,12 @@
             </div>
 
             <div class="controls">
-              <button class="ctrl" aria-label="Rewind">◄◄</button>
+              <span class="ctrl" aria-hidden="true">◄◄</span>
               <button class="ctrl ctrl--play" id="playBtn" aria-label="Play — почати історію">
                 <span class="ctrl__glyph">▶</span>
                 <span class="ctrl__hint" id="playHint">почати історію</span>
               </button>
-              <button class="ctrl" aria-label="Forward">►►</button>
+              <span class="ctrl" aria-hidden="true">►►</span>
             </div>
           </div>
 
@@ -138,8 +144,8 @@
       <p class="hero__lead">Натисни <b>PLAY</b>, щоб прожити <b>20&nbsp;років</b> історії.</p>
 
       <div class="hero__cta">
-        <a href="#albums" class="btn btn--solid" data-cursor="▶">Слухати</a>
-        <a href="#tours" class="btn btn--ghost">Квитки на концерти</a>
+        <a href="#albums" class="btn btn--solid" data-cursor="▶">▶ Слухати</a>
+        <a href="#tours" class="btn btn--ticket" data-cursor="🎫">🎫 Квитки на концерти</a>
       </div>
 
       <p class="deco-label" id="decoLabel" aria-hidden="true">корпус</p>
@@ -152,7 +158,8 @@
   </header>
 
   <!-- ============ 2. HISTORY — documentary ============ -->
-  <section id="history" class="history section" data-track="01" aria-label="Історія">
+  <section id="history" class="history section" data-track="01" aria-labelledby="historyHeading">
+    <h2 id="historyHeading" class="sr-only">Історія гурту — TRACK 01 / 2004 → сьогодні</h2>
     <div class="history__bg" aria-hidden="true"></div>
 
     <!-- касетна стрічка з Hero стає таймлайном -->

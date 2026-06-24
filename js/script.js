@@ -130,14 +130,22 @@
   const topnav = $('#topnav');
   const burger = $('#navBurger');
 
-  function closeMenu() {
-    if (topnav) topnav.classList.remove('open');
-    if (burger) burger.setAttribute('aria-expanded', 'false');
-  }
-  if (burger) burger.addEventListener('click', () => {
-    const open = topnav.classList.toggle('open');
+  const navList = $('#navList');
+  function setMenu(open) {
+    if (!topnav || !burger) return;
+    topnav.classList.toggle('open', open);
     burger.setAttribute('aria-expanded', String(open));
-  });
+    burger.setAttribute('aria-label', open ? 'Закрити меню' : 'Відкрити меню');
+    if (open && navList) { const first = navList.querySelector('a'); if (first) first.focus(); }
+  }
+  function closeMenu() {
+    if (!topnav || !topnav.classList.contains('open')) return;
+    const focusInside = navList && navList.contains(document.activeElement);
+    setMenu(false);
+    if (focusInside && burger) burger.focus();   // return focus to the trigger
+  }
+  if (burger) burger.addEventListener('click', () => setMenu(!topnav.classList.contains('open')));
+  addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMenu(); });
 
   $$('a[href^="#"]').forEach((a) =>
     a.addEventListener('click', (e) => {
@@ -200,7 +208,7 @@
   const docProgress = $('#docProgress');
   function updateHistoryTrack() {
     if (!docStage || !docTrack) return;
-    if (innerWidth <= 720) { docTrack.style.transform = ''; if (docProgress) docProgress.style.width = ''; return; }
+    if (innerWidth <= 720 || reduceMotion) { docTrack.style.transform = ''; if (docProgress) docProgress.style.width = ''; return; }
     const scenes = $$('.doc-scene', docTrack);
     if (!scenes.length) return;
     const total = docStage.offsetHeight - innerHeight;
@@ -234,7 +242,7 @@
   const albumsSection = $('#albums');
 
   function updateAlbums() {
-    if (!scroller || !track || innerWidth <= 720) return;
+    if (!scroller || !track || innerWidth <= 720 || reduceMotion) return;
     const rect = scroller.getBoundingClientRect();
     const total = scroller.offsetHeight - innerHeight;
     let p = -rect.top / total;            // 0 → 1 through the sticky zone
@@ -274,31 +282,38 @@
   const map = $('#tourMap');
   const card = $('#cityCard');
   if (map && card) {
+    let pinned = null;                                  // city pinned by tap/click (touch + click-to-keep)
+    const show = (city) => {
+      $('#cardCity').textContent = city.dataset.city;
+      $('#cardYear').textContent = city.dataset.year;
+      $('#cardVenue').textContent = city.dataset.venue;
+      $('#cardGuests').textContent = city.dataset.guests;
+      const mr = map.getBoundingClientRect();
+      const cr = city.getBoundingClientRect();
+      let x = cr.left - mr.left + cr.width / 2;
+      let y = cr.top - mr.top - 12;
+      x = Math.min(mr.width - 110, Math.max(110, x));   // keep card inside the map
+      card.style.left = x + 'px';
+      card.style.top = y + 'px';
+      card.style.transform = 'translate(-50%,-100%)';
+      card.classList.add('show');
+      const flash = $('.map__card-flash');
+      flash.style.animation = 'none'; void flash.offsetWidth; flash.style.animation = '';   // restart flash
+    };
+    const hide = () => { card.classList.remove('show'); pinned = null; };
     $$('.city', map).forEach((city) => {
-      const show = () => {
-        $('#cardCity').textContent = city.dataset.city;
-        $('#cardYear').textContent = city.dataset.year;
-        $('#cardVenue').textContent = city.dataset.venue;
-        $('#cardGuests').textContent = city.dataset.guests;
-        const mr = map.getBoundingClientRect();
-        const cr = city.getBoundingClientRect();
-        let x = cr.left - mr.left + cr.width / 2;
-        let y = cr.top - mr.top - 12;
-        // keep card inside the map
-        x = Math.min(mr.width - 110, Math.max(110, x));
-        card.style.left = x + 'px';
-        card.style.top = y + 'px';
-        card.style.transform = 'translate(-50%,-100%)';
-        card.classList.add('show');
-        // restart flash
-        const flash = $('.map__card-flash');
-        flash.style.animation = 'none'; void flash.offsetWidth; flash.style.animation = '';
-      };
-      city.addEventListener('mouseenter', show);
-      city.addEventListener('focus', show);
-      city.addEventListener('mouseleave', () => card.classList.remove('show'));
-      city.addEventListener('blur', () => card.classList.remove('show'));
+      city.addEventListener('mouseenter', () => { if (!pinned) show(city); });
+      city.addEventListener('mouseleave', () => { if (!pinned) card.classList.remove('show'); });
+      city.addEventListener('focus', () => show(city));
+      city.addEventListener('blur', () => { if (!pinned) card.classList.remove('show'); });
+      // tap / click pins the card open (essential on touch, where there is no hover)
+      city.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (pinned === city) { hide(); } else { show(city); pinned = city; }
+      });
     });
+    // dismiss a pinned card when tapping outside the map
+    addEventListener('click', (e) => { if (pinned && !map.contains(e.target)) hide(); });
   }
 
   /* =================================================================
