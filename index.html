@@ -44,14 +44,20 @@
     <div class="rewind__strip"></div>
   </div>
 
-  <!-- ============ SIDE TRACKLIST NAV ============ -->
-  <nav class="tracknav" aria-label="Навігація по треках">
-    <a href="#hero"    class="tracknav__item is-active" data-label="INTRO"><span>00</span></a>
-    <a href="#history" class="tracknav__item" data-label="ІСТОРІЯ"><span>01</span></a>
-    <a href="#albums"  class="tracknav__item" data-label="АЛЬБОМИ"><span>02</span></a>
-    <a href="#tours"   class="tracknav__item" data-label="ТУРИ"><span>03</span></a>
-    <a href="#merch"   class="tracknav__item" data-label="МЕРЧ"><span>04</span></a>
-    <a href="#moments" class="tracknav__item" data-label="МОМЕНТИ"><span>05</span></a>
+  <!-- ============ FIXED TOP NAV ============ -->
+  <nav class="topnav" id="topnav" aria-label="Навігація">
+    <a href="#hero" class="topnav__logo" data-cursor="▶">БУМБОКС</a>
+    <button class="topnav__burger" id="navBurger" aria-label="Меню" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="topnav__list" id="navList">
+      <li><a href="#hero"    class="topnav__item is-active"><b>00</b><span>Hero</span></a></li>
+      <li><a href="#history" class="topnav__item"><b>01</b><span>Історія</span></a></li>
+      <li><a href="#albums"  class="topnav__item"><b>02</b><span>Альбоми</span></a></li>
+      <li><a href="#tours"   class="topnav__item"><b>03</b><span>Концерти</span></a></li>
+      <li><a href="#merch"   class="topnav__item"><b>04</b><span>Мерч</span></a></li>
+      <li><a href="#footer"  class="topnav__item"><b>05</b><span>Контакти</span></a></li>
+    </ul>
   </nav>
 
   <!-- ============ 1. HERO ============ -->
@@ -134,21 +140,24 @@
   <section id="history" class="history section" data-track="01">
     <div class="history__bg" aria-hidden="true"></div>
 
-    <div class="container history__head reveal">
-      <p class="track-tag">TRACK 01 / ІСТОРІЯ</p>
-      <h2 class="display-h">2004 — Київ</h2>
-      <p class="lead-p">Усе почалось у Києві. З трьох людей, звуку і бажання робити музику по-своєму.</p>
+    <header class="history__banner reveal">
+      <div class="history__banner-photo" aria-hidden="true"></div>
+      <div class="container history__head">
+        <p class="track-tag">TRACK 01 / ІСТОРІЯ</p>
+        <h2 class="display-h">2004 — Київ</h2>
+        <p class="lead-p">Усе почалось у Києві. З трьох людей, звуку і бажання робити музику по-своєму.</p>
 
-      <!-- mini audio player (таймер біжить при скролі) -->
-      <div class="miniplayer" id="miniplayer">
-        <button class="miniplayer__btn" aria-label="Play history">▶</button>
-        <div class="miniplayer__meta">
-          <span class="miniplayer__title">TRACK 01 / HISTORY</span>
-          <div class="miniplayer__bar"><span id="historyProgress"></span></div>
-          <span class="miniplayer__time"><b id="historyTime">00:04</b> / 20:00</span>
+        <!-- mini audio player (таймер біжить при скролі) -->
+        <div class="miniplayer" id="miniplayer">
+          <button class="miniplayer__btn" aria-label="Play history">▶</button>
+          <div class="miniplayer__meta">
+            <span class="miniplayer__title">TRACK 01 / HISTORY</span>
+            <div class="miniplayer__bar"><span id="historyProgress"></span></div>
+            <span class="miniplayer__time"><b id="historyTime">00:04</b> / 20:00</span>
+          </div>
         </div>
       </div>
-    </div>
+    </header>
 
     <!-- касетна стрічка з Hero стає таймлайном -->
     <div class="timeline container reveal">
@@ -163,8 +172,9 @@
       </ol>
     </div>
 
-    <!-- documentary scenes -->
-    <div class="doc container">
+    <!-- documentary scenes — horizontal timeline (real sideways scroll) -->
+    <div class="doc-wrap reveal">
+      <div class="doc" id="docScroll" role="region" aria-label="Таймлайн історії" tabindex="0">
 
       <!-- 2004 -->
       <article class="doc-scene reveal">
@@ -237,9 +247,9 @@
       <!-- 2018 -->
       <article class="doc-scene doc-scene--rev reveal">
         <figure class="scene__media scene__media--leaving">
-          <img src="assets/portrait-samoylo.jpg" alt="Андрій «Муха» Самойло" onerror="this.classList.add('img-missing')">
-          <span class="scene__ph">assets/portrait-samoylo.jpg</span>
-          <figcaption>Андрій «Муха» Самойло</figcaption>
+          <img src="assets/history-samoylo.jpg" alt="Бумбокс, 2018" onerror="this.classList.add('img-missing')">
+          <span class="scene__ph">assets/history-samoylo.jpg</span>
+          <figcaption>2018</figcaption>
         </figure>
         <div class="scene__body">
           <span class="scene__chip scene__chip--red">▶ 2018</span>
@@ -276,11 +286,19 @@
           <p>Благодійні тури, концерти підтримки та збори для України. Музика стає голосом і опорою — там, де вона потрібна найбільше.</p>
         </div>
       </article>
+      </div>
+      <div class="doc-controls">
+        <button class="doc-arrow" id="docPrev" aria-label="Попередній рік">◄</button>
+        <p class="doc-hint">Гортай убік, щоб перемотати історію</p>
+        <button class="doc-arrow" id="docNext" aria-label="Наступний рік">►</button>
+      </div>
+      <span class="doc-progress"><i id="docProgress"></i></span>
     </div>
 
     <!-- стрічка згортається в платівку → альбоми -->
-    <div class="tape-to-disc reveal" aria-hidden="true">
-      <span class="ttd-disc"></span>
+    <div class="tape-to-disc reveal">
+      <span class="ttd-tape" aria-hidden="true"></span>
+      <span class="ttd-disc" aria-hidden="true"></span>
       <span class="ttd-text">стрічка згортається в платівку…</span>
     </div>
   </section>

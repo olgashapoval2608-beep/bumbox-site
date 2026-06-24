@@ -125,13 +125,24 @@
   /* =================================================================
      SIDE TRACKNAV — active section + smooth anchor scroll
      ================================================================= */
-  const navItems = $$('.tracknav__item');
+  const navItems = $$('.topnav__item');
   const sections = navItems.map((a) => $(a.getAttribute('href'))).filter(Boolean);
+  const topnav = $('#topnav');
+  const burger = $('#navBurger');
+
+  function closeMenu() {
+    if (topnav) topnav.classList.remove('open');
+    if (burger) burger.setAttribute('aria-expanded', 'false');
+  }
+  if (burger) burger.addEventListener('click', () => {
+    const open = topnav.classList.toggle('open');
+    burger.setAttribute('aria-expanded', String(open));
+  });
 
   $$('a[href^="#"]').forEach((a) =>
     a.addEventListener('click', (e) => {
       const id = a.getAttribute('href');
-      if (id.length > 1 && $(id)) { e.preventDefault(); goTo(id); }
+      if (id.length > 1 && $(id)) { e.preventDefault(); goTo(id); closeMenu(); }
     })
   );
 
@@ -182,6 +193,28 @@
   const historySection = $('#history');
   const hProgress = $('#historyProgress');
   const hTime = $('#historyTime');
+
+  /* ===== History — horizontal timeline (arrows + progress) ===== */
+  const docScroll = $('#docScroll');
+  if (docScroll) {
+    const docScenes = $$('.doc-scene', docScroll);
+    const docStep = () => {
+      const s = docScenes[0];
+      const gap = parseFloat(getComputedStyle(docScroll).columnGap) || 0;
+      return s ? s.offsetWidth + gap : docScroll.clientWidth * 0.85;
+    };
+    const next = $('#docNext'), prev = $('#docPrev'), dProg = $('#docProgress');
+    if (next) next.addEventListener('click', () => docScroll.scrollBy({ left: docStep(), behavior: 'smooth' }));
+    if (prev) prev.addEventListener('click', () => docScroll.scrollBy({ left: -docStep(), behavior: 'smooth' }));
+    if (dProg) {
+      const updDoc = () => {
+        const max = docScroll.scrollWidth - docScroll.clientWidth;
+        dProg.style.width = (max > 0 ? Math.max(14, (docScroll.scrollLeft / max) * 100) : 100) + '%';
+      };
+      docScroll.addEventListener('scroll', updDoc, { passive: true });
+      updDoc();
+    }
+  }
 
   /* =================================================================
      ALBUMS — sticky vertical→horizontal carousel
