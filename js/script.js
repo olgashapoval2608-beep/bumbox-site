@@ -205,10 +205,17 @@
     if (!scenes.length) return;
     const total = docStage.offsetHeight - innerHeight;
     const p = total > 0 ? Math.min(1, Math.max(0, -docStage.getBoundingClientRect().top / total)) : 0;
-    const first = scenes[0], last = scenes[scenes.length - 1];
-    const startC = first.offsetLeft + first.offsetWidth / 2;
-    const endC = last.offsetLeft + last.offsetWidth / 2;
-    const target = startC + (endC - startC) * p;          // map scroll progress → horizontal position
+    const n = scenes.length;
+    const center = (el) => el.offsetLeft + el.offsetWidth / 2;
+    // SNAP easing: hold each mini-page centered, then quickly advance to the next one
+    // ("із кожним скролом роби по центру одразу міні сторінку")
+    const fp = p * (n - 1);
+    const i = Math.min(n - 2, Math.floor(fp));
+    const local = fp - i;
+    const HOLD = 0.45;                                     // dwell on the centered card for ~45% of each step
+    let e = local <= HOLD ? 0 : (local - HOLD) / (1 - HOLD);
+    e = e * e * e * (e * (e * 6 - 15) + 10);              // smootherstep → distinct hold + snap to next
+    const target = center(scenes[i]) + (center(scenes[i + 1]) - center(scenes[i])) * e;
     docTrack.style.transform = `translateX(${-(target - innerWidth / 2)}px)`;
     if (docProgress) docProgress.style.width = Math.max(10, p * 100) + '%';
     // center highlight → triggers reveal of leaving/new-member animations
@@ -400,6 +407,18 @@
 
   const heroPhoto = $('.hero-photo');
   const heroIntro = $('#heroIntro');
+  const cassetteWindow = $('.cassette__window');
+
+  // Anchor the growing photo to the cassette window so it literally emerges FROM the cassette.
+  // ("треба щоб фото з касети з'являлось а не просто так")
+  function setHeroPhotoOrigin() {
+    if (!cassetteWindow || !heroPhoto) return;
+    const r = cassetteWindow.getBoundingClientRect();
+    if (!r.width) return;
+    const cx = ((r.left + r.width / 2) / innerWidth) * 100;
+    const cy = ((r.top + r.height / 2) / innerHeight) * 100;
+    heroPhoto.style.transformOrigin = `${cx.toFixed(2)}% ${cy.toFixed(2)}%`;
+  }
 
   function resetHero() {
     heroCopy.forEach((el) => el.style.removeProperty('opacity'));
@@ -416,7 +435,7 @@
     const total = heroZone.offsetHeight - innerHeight;
     const p = total > 0 ? Math.min(1, Math.max(0, scrollY / total)) : 0;
     if (p <= 0.001) { if (bbTakeover) boombox.style.transform = REST_T; resetHero(); return; }
-    if (!bbTakeover) { boombox.style.animation = 'none'; bbTakeover = true; }   // take over from the entrance animation
+    if (!bbTakeover) { setHeroPhotoOrigin(); boombox.style.animation = 'none'; bbTakeover = true; }   // capture cassette position, then take over the entrance animation
     // boombox grows a little, then fades as the photo takes over
     const k = Math.min(1, p * 2.5);                        // flatten the tilt early
     boombox.style.transform = `perspective(${1400 + p * 4000}px) rotateX(${6 * (1 - k)}deg) rotateY(${-7 * (1 - k)}deg) scale(${1 + p * 1.4})`;
@@ -434,7 +453,7 @@
     if (scrollCue) scrollCue.style.setProperty('opacity', op, 'important');
     // mini-player timer follows the zoom
     if (hProgress) hProgress.style.width = (p * 100) + '%';
-    if (hTime) { const s = Math.floor(p * 150); hTime.textContent = `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`; }
+    if (hTime) { const s = Math.floor(p * 1200); hTime.textContent = `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`; }   // 00:00 → 20:00 as you scroll into TRACK 01
   }
 
   /* =================================================================

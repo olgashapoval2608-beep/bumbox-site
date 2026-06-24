@@ -171,7 +171,6 @@
     <!-- documentary scenes — horizontal timeline driven by vertical scroll -->
     <div class="doc-stage" id="docStage">
       <div class="doc-pin">
-        <p class="doc-hint">Гортай вниз — історія рухається вбік</p>
         <div class="doc-track" id="docTrack" role="region" aria-label="Таймлайн історії">
 
       <!-- 2004 -->
@@ -206,10 +205,9 @@
 
       <!-- 2005–2007 -->
       <article class="doc-scene doc-scene--rev reveal">
-        <figure class="scene__media">
-          <img src="assets/album-family-biznes.jpg" alt="Бумбокс — Family Бізнес (2007)" onerror="this.classList.add('img-missing')">
-          <span class="scene__ph">assets/album-family-biznes.jpg</span>
-          <figcaption>family бізнес · 2007</figcaption>
+        <figure class="scene__media scene__media--video">
+          <video class="scene__video" src="assets/video-staryi.mp4" autoplay muted loop playsinline preload="metadata"></video>
+          <figcaption>«Старий» · 2005–2007</figcaption>
         </figure>
         <div class="scene__body">
           <span class="scene__chip">▶ 2005–2007</span>
@@ -244,10 +242,9 @@
 
       <!-- 2018 -->
       <article class="doc-scene doc-scene--rev reveal">
-        <figure class="scene__media scene__media--leaving">
+        <figure class="scene__media scene__media--color">
           <img src="assets/history-samoylo.jpg" alt="Бумбокс, 2018" onerror="this.classList.add('img-missing')">
           <span class="scene__ph">assets/history-samoylo.jpg</span>
-          <figcaption>2018</figcaption>
         </figure>
         <div class="scene__body">
           <span class="scene__chip scene__chip--red">▶ 2018</span>
@@ -285,15 +282,7 @@
         </div>
       </article>
         </div>
-        <span class="doc-progress"><i id="docProgress"></i></span>
       </div>
-    </div>
-
-    <!-- стрічка згортається в платівку → альбоми -->
-    <div class="tape-to-disc reveal">
-      <span class="ttd-tape" aria-hidden="true"></span>
-      <span class="ttd-disc" aria-hidden="true"></span>
-      <span class="ttd-text">стрічка згортається в платівку…</span>
     </div>
   </section>
 
