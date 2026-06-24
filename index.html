@@ -64,6 +64,7 @@
   <header id="hero" class="hero section">
     <div class="hero__inner">
       <div class="hero__spot" aria-hidden="true"></div>
+      <div class="hero-photo" aria-hidden="true"></div>
 
       <p class="hero__eyebrow">КИЇВ · 2004 — ∞</p>
 
@@ -88,6 +89,7 @@
                 <span class="reel reel--l"></span>
                 <span class="reel reel--r"></span>
                 <span class="cassette__tape"></span>
+                <span class="cassette__photo" aria-hidden="true"></span>
               </div>
               <span class="cassette__label">TRACK 01 — BUMBOX 20</span>
             </div>
@@ -172,9 +174,11 @@
       </ol>
     </div>
 
-    <!-- documentary scenes — horizontal timeline (real sideways scroll) -->
-    <div class="doc-wrap reveal">
-      <div class="doc" id="docScroll" role="region" aria-label="Таймлайн історії" tabindex="0">
+    <!-- documentary scenes — horizontal timeline driven by vertical scroll -->
+    <div class="doc-stage" id="docStage">
+      <div class="doc-pin">
+        <p class="doc-hint">Гортай вниз — історія рухається вбік</p>
+        <div class="doc-track" id="docTrack" role="region" aria-label="Таймлайн історії">
 
       <!-- 2004 -->
       <article class="doc-scene reveal">
@@ -286,13 +290,9 @@
           <p>Благодійні тури, концерти підтримки та збори для України. Музика стає голосом і опорою — там, де вона потрібна найбільше.</p>
         </div>
       </article>
+        </div>
+        <span class="doc-progress"><i id="docProgress"></i></span>
       </div>
-      <div class="doc-controls">
-        <button class="doc-arrow" id="docPrev" aria-label="Попередній рік">◄</button>
-        <p class="doc-hint">Гортай убік, щоб перемотати історію</p>
-        <button class="doc-arrow" id="docNext" aria-label="Наступний рік">►</button>
-      </div>
-      <span class="doc-progress"><i id="docProgress"></i></span>
     </div>
 
     <!-- стрічка згортається в платівку → альбоми -->

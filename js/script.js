@@ -194,26 +194,28 @@
   const hProgress = $('#historyProgress');
   const hTime = $('#historyTime');
 
-  /* ===== History — horizontal timeline (arrows + progress) ===== */
-  const docScroll = $('#docScroll');
-  if (docScroll) {
-    const docScenes = $$('.doc-scene', docScroll);
-    const docStep = () => {
-      const s = docScenes[0];
-      const gap = parseFloat(getComputedStyle(docScroll).columnGap) || 0;
-      return s ? s.offsetWidth + gap : docScroll.clientWidth * 0.85;
-    };
-    const next = $('#docNext'), prev = $('#docPrev'), dProg = $('#docProgress');
-    if (next) next.addEventListener('click', () => docScroll.scrollBy({ left: docStep(), behavior: 'smooth' }));
-    if (prev) prev.addEventListener('click', () => docScroll.scrollBy({ left: -docStep(), behavior: 'smooth' }));
-    if (dProg) {
-      const updDoc = () => {
-        const max = docScroll.scrollWidth - docScroll.clientWidth;
-        dProg.style.width = (max > 0 ? Math.max(14, (docScroll.scrollLeft / max) * 100) : 100) + '%';
-      };
-      docScroll.addEventListener('scroll', updDoc, { passive: true });
-      updDoc();
-    }
+  /* ===== History — horizontal timeline driven by vertical scroll (sticky pin) ===== */
+  const docStage = $('#docStage');
+  const docTrack = $('#docTrack');
+  const docProgress = $('#docProgress');
+  function updateHistoryTrack() {
+    if (!docStage || !docTrack) return;
+    if (innerWidth <= 720) { docTrack.style.transform = ''; if (docProgress) docProgress.style.width = ''; return; }
+    const scenes = $$('.doc-scene', docTrack);
+    if (!scenes.length) return;
+    const total = docStage.offsetHeight - innerHeight;
+    const p = total > 0 ? Math.min(1, Math.max(0, -docStage.getBoundingClientRect().top / total)) : 0;
+    const first = scenes[0], last = scenes[scenes.length - 1];
+    const startC = first.offsetLeft + first.offsetWidth / 2;
+    const endC = last.offsetLeft + last.offsetWidth / 2;
+    const target = startC + (endC - startC) * p;          // map scroll progress → horizontal position
+    docTrack.style.transform = `translateX(${-(target - innerWidth / 2)}px)`;
+    if (docProgress) docProgress.style.width = Math.max(10, p * 100) + '%';
+    // center highlight → triggers reveal of leaving/new-member animations
+    const mid = innerWidth / 2;
+    let best = null, bd = Infinity;
+    scenes.forEach((s) => { const r = s.getBoundingClientRect(); const d = Math.abs(r.left + r.width / 2 - mid); if (d < bd) { bd = d; best = s; } });
+    scenes.forEach((s) => s.classList.toggle('is-center', s === best));
   }
 
   /* =================================================================
@@ -380,61 +382,53 @@
         if (displayEl) displayEl.classList.remove('blink');
         display.textContent = 'БУМБОКС';
         displaySub.textContent = 'stereo cassette';
-        updateHeroDecompose();
+        bbTakeover = false; boombox.style.transform = ''; boombox.style.animation = '';
+        updateHeroZoom();
       }, 1400);
     });
   }
 
   /* =================================================================
-     HERO — sticky scroll "decompose": корпус → касета → стрічка → звук → концерт
+     HERO — scroll-zoom into the cassette → TRACK 01 / ІСТОРІЯ
      ================================================================= */
   const heroZone = $('#hero');
   const heroCopy = $$('.hero__eyebrow, .hero__title, .hero__lead, .hero__cta');
   const scrollCue = $('.scroll-cue');
-  const decoLabel = $('#decoLabel');
-  const bbHandle = $('.boombox__handle');
-  const bbLeft = $('.speaker--left');
-  const bbRight = $('.speaker--right');
-  const bbCenter = $('.boombox__center');
-  const bbBody = $('.boombox__body');
-  const decoLayers = ['корпус', 'касета', 'стрічка', 'звук', 'концерт'];
+  const cassettePhoto = $('.cassette__photo');
+  let bbTakeover = false;
+  const REST_T = 'perspective(1400px) rotateX(6deg) rotateY(-7deg)';
 
-  function clearDecompose() {
-    [bbHandle, bbLeft, bbRight, bbCenter, bbBody].forEach((el) => {
-      if (el) { el.style.transform = ''; el.style.opacity = ''; el.style.filter = ''; el.style.boxShadow = ''; }
-    });
+  const heroPhoto = $('.hero-photo');
+
+  function resetHeroCopy() {
     heroCopy.forEach((el) => el.style.removeProperty('opacity'));
     if (scrollCue) scrollCue.style.removeProperty('opacity');
-    if (decoLabel) decoLabel.style.opacity = '0';
+    if (cassettePhoto) cassettePhoto.style.opacity = '';
+    if (heroPhoto) { heroPhoto.style.opacity = '0'; heroPhoto.style.transform = ''; }
+    if (bbTakeover) boombox.style.opacity = '1';
   }
 
-  function updateHeroDecompose() {
-    if (!heroZone || !bbBody) return;
-    if (reduceMotion || innerWidth <= 720) { clearDecompose(); return; }
-    if (boombox.classList.contains('playing')) return;     // don't fight the PLAY warp
+  function updateHeroZoom() {
+    if (!heroZone || !boombox) return;
+    if (reduceMotion || innerWidth <= 720) { if (bbTakeover) boombox.style.transform = REST_T; resetHeroCopy(); return; }
+    if (boombox.classList.contains('playing')) return;     // PLAY handles its own transition
     const total = heroZone.offsetHeight - innerHeight;
     const p = total > 0 ? Math.min(1, Math.max(0, scrollY / total)) : 0;
-    if (p <= 0.001) { clearDecompose(); return; }
-
-    bbHandle.style.transform = `translateY(${-p * 230}px) rotate(${-p * 6}deg)`;
-    bbHandle.style.opacity = String(1 - p);
-    bbLeft.style.transform = `translate(${-p * 46}vw, ${-p * 9}vh) rotate(${-p * 38}deg)`;
-    bbLeft.style.opacity = String(1 - p * 0.7);
-    bbCenter.style.transform = `translateY(${p * 36}vh) scale(${1 - p * 0.12})`;
-    bbCenter.style.opacity = String(1 - p * 0.85);
-    // the right speaker survives and swells into a concert spotlight
-    bbRight.style.transform = `translate(${p * 10}vw, ${-p * 2}vh) scale(${1 + p * 0.9})`;
-    bbRight.style.filter = `brightness(${1 + p * 1.4})`;
-    bbRight.style.boxShadow = `0 0 ${p * 90}px ${p * 22}px rgba(245,197,24,${p * 0.55})`;
-    bbBody.style.opacity = String(1 - p * 0.35);
-
-    const copyOpacity = String(Math.max(0, 1 - p * 4));   // !important beats the fadeUp entrance animation
-    heroCopy.forEach((el) => el.style.setProperty('opacity', copyOpacity, 'important'));
-    if (scrollCue) scrollCue.style.setProperty('opacity', copyOpacity, 'important');
-    if (decoLabel) {
-      decoLabel.textContent = decoLayers[Math.min(decoLayers.length - 1, Math.floor(p * decoLayers.length))];
-      decoLabel.style.opacity = p > 0.05 && p < 0.97 ? '0.85' : '0';
+    if (p <= 0.001) { if (bbTakeover) boombox.style.transform = REST_T; resetHeroCopy(); return; }
+    if (!bbTakeover) { boombox.style.animation = 'none'; bbTakeover = true; }   // take over from the entrance animation
+    // boombox grows moderately toward the cassette, then fades as the photo takes over
+    const k = Math.min(1, p * 2.5);                        // flatten the tilt early
+    boombox.style.transform = `perspective(${1400 + p * 5000}px) rotateX(${6 * (1 - k)}deg) rotateY(${-7 * (1 - k)}deg) scale(${1 + p * 1.7})`;
+    boombox.style.opacity = String(Math.max(0, 1 - Math.max(0, p - 0.5) / 0.32));
+    if (cassettePhoto) cassettePhoto.style.opacity = String(Math.min(1, p * 3));   // photo appears on the cassette
+    // crisp full-res photo blooms out of the cassette → fills the screen (TRACK 01)
+    if (heroPhoto) {
+      heroPhoto.style.transform = `scale(${0.12 + 0.88 * Math.min(1, p / 0.82)})`;
+      heroPhoto.style.opacity = String(Math.min(1, Math.max(0, p - 0.32) / 0.4));
     }
+    const op = String(Math.max(0, 1 - p * 5));             // !important beats the fadeUp entrance animation
+    heroCopy.forEach((el) => el.style.setProperty('opacity', op, 'important'));
+    if (scrollCue) scrollCue.style.setProperty('opacity', op, 'important');
   }
 
   /* =================================================================
@@ -445,7 +439,8 @@
     if (ticking) return;
     ticking = true;
     requestAnimationFrame(() => {
-      updateHeroDecompose();
+      updateHeroZoom();
+      updateHistoryTrack();
       updateAlbums();
 
       // history mini-player progress
@@ -471,7 +466,8 @@
     });
   }
   addEventListener('scroll', onScroll, { passive: true });
-  addEventListener('resize', () => { updateAlbums(); updateHeroDecompose(); });
+  addEventListener('resize', () => { updateAlbums(); updateHeroZoom(); updateHistoryTrack(); });
   updateAlbums();
-  updateHeroDecompose();
+  updateHeroZoom();
+  updateHistoryTrack();
 })();
