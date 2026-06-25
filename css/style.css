@@ -653,7 +653,7 @@ b{font-weight:600;color:var(--cream)}
    ================================================================= */
 .tours{padding:16vh 0 12vh;background:linear-gradient(180deg,#05080d,#070707)}
 .tours__head{text-align:center;margin-bottom:6vh}
-.map{position:relative;width:min(1080px,94vw);margin:0 auto;aspect-ratio:1000/778;
+.map{position:relative;width:min(940px,92vw);margin:0 auto;aspect-ratio:1000/652;
   border-radius:12px;border:1px solid #16202c;overflow:hidden;
   background:
     radial-gradient(80% 90% at 55% 45%,rgba(20,40,70,.45),transparent 75%),
