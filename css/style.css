@@ -932,22 +932,79 @@ b{font-weight:600;color:var(--cream)}
 /* =================================================================
    6. MOMENTS
    ================================================================= */
-.moments{padding:16vh 0 0;background:linear-gradient(180deg,#070707,#050505)}
-.moments__head{text-align:center;margin-bottom:4vh}
-.scatter{position:relative;width:min(1100px,94vw);height:70vh;margin:0 auto}
-.photo{position:absolute;width:clamp(110px,14vw,180px);aspect-ratio:4/5;
-  background:linear-gradient(160deg,#2a2620,#0c0b0a);border:6px solid #efe7d6;border-bottom-width:34px;
-  box-shadow:0 14px 30px rgba(0,0,0,.6);transition:transform .4s var(--ease),box-shadow .4s var(--ease);
-  filter:grayscale(.55) contrast(1.05);will-change:transform}
-.photo::after{content:attr(data-tag);position:absolute;bottom:-26px;left:0;right:0;text-align:center;
-  font-family:'Caveat','Segoe Script',cursive;font-size:.8rem;color:#3a342c}
-.photo:hover{transform:scale(1.12) rotate(0deg) !important;z-index:20;filter:grayscale(0);
-  box-shadow:0 26px 60px rgba(0,0,0,.8),0 0 30px rgba(245,197,24,.2)}
-.photo.live::before{content:'● REC';position:absolute;top:6px;left:6px;z-index:3;font-family:var(--font-mono);
-  font-size:.5rem;color:var(--red);letter-spacing:.1em}
-/* video tiles inside the Moments wall */
-.photo--video video{position:absolute;inset:0;z-index:0;width:100%;height:100%;object-fit:cover;background:#0c0b0a}
-.photo--video::after{z-index:3}
+.moments{position:relative;padding:18vh 0 0;
+  background:radial-gradient(125% 80% at 50% -8%,#100e0c 0%,#080706 46%,#020201 100%)}
+/* subtle cinematic film grain across the whole section */
+.moments::before{content:'';position:absolute;inset:0;z-index:0;pointer-events:none;opacity:.4;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size:170px 170px}
+.moments>*{position:relative;z-index:1}
+
+.moments__head{text-align:center;margin-bottom:7vh;padding-inline:1.2rem}
+.moments__title{display:inline-block;position:relative;font-size:clamp(2.7rem,7vw,5.6rem);line-height:.92;
+  letter-spacing:-.015em;margin:.3rem 0 0}
+.moments__title::after{content:'';position:absolute;left:50%;bottom:-.32em;transform:translateX(-50%) rotate(-1.4deg);
+  width:clamp(64px,8vw,128px);height:5px;border-radius:3px;background:var(--yellow);box-shadow:0 0 20px rgba(245,197,24,.55)}
+.moments__sub{max-width:50ch;margin:1.9rem auto 0;color:var(--cream);opacity:.74;
+  font-size:clamp(.92rem,1.5vw,1.08rem);line-height:1.6}
+
+/* ---- the memory wall: CSS-columns masonry of polaroids ---- */
+.scatter{width:min(1180px,92vw);margin:0 auto;padding:1vh 1.2vw 6vh;overflow:visible;
+  column-count:4;column-gap:clamp(16px,2.3vw,34px)}
+.photo{position:relative;break-inside:avoid;-webkit-column-break-inside:avoid;page-break-inside:avoid;
+  margin:0 0 clamp(22px,3vw,42px)}
+.photo--tuck{margin-top:clamp(-48px,-4.5vw,-22px)}            /* tuck up under the card above → overlap + depth */
+.photo--lift{z-index:4}
+.photo:hover{z-index:30}
+
+/* polaroid card — cream stock with paper texture on the FRAME only + realistic stacked shadow */
+.photo__card{position:relative;display:block;border-radius:4px;padding:7% 7% 18%;cursor:pointer;
+  transform:rotate(var(--rot,0deg));transform-origin:50% 64%;
+  background-color:#f2ead8;background-size:120px 120px,cover,cover;background-blend-mode:multiply,screen,normal;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)' opacity='0.35'/%3E%3C/svg%3E"),
+    radial-gradient(130% 120% at 26% 8%,rgba(255,255,255,.5),rgba(255,255,255,0) 50%),
+    linear-gradient(150deg,#f6efdd,#e7dcc4);
+  box-shadow:0 1px 1px rgba(0,0,0,.4),0 9px 18px rgba(0,0,0,.42),0 24px 44px rgba(0,0,0,.5);
+  transition:transform .5s cubic-bezier(.34,1.34,.5,1),box-shadow .45s var(--ease)}
+.photo__img{position:relative;z-index:1;aspect-ratio:var(--ar,4/5);background:#16130f 50%/cover no-repeat}
+.photo__cap{position:absolute;left:7%;right:7%;bottom:5%;z-index:3;text-align:center;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis;color:#2c2820;
+  font-family:'Caveat','Segoe Script',cursive;font-size:clamp(.92rem,1.5vw,1.2rem);line-height:1}
+
+/* hover: slight lift, tiny extra tilt, soft glow */
+.photo__card:hover{transform:rotate(var(--rot,0deg)) translateY(-12px) rotate(1.6deg) scale(1.035);z-index:30;
+  box-shadow:0 4px 8px rgba(0,0,0,.4),0 22px 40px rgba(0,0,0,.55),0 42px 82px rgba(0,0,0,.5),0 0 38px rgba(245,197,24,.16)}
+.photo__card:focus-visible{outline:2px solid var(--yellow);outline-offset:4px}
+
+/* video tiles */
+.photo__img--video{overflow:hidden}
+.photo__img--video video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#0c0b0a}
+.photo__img--video::after{content:'▶';position:absolute;left:8px;bottom:8px;z-index:2;width:1.6em;height:1.6em;
+  display:grid;place-items:center;border-radius:50%;background:var(--yellow);color:#1a1510;font-size:.6rem;
+  box-shadow:0 2px 6px rgba(0,0,0,.5)}
+
+/* ---- scrapbook decorations: tape, date stamp, label, yellow sticker ---- */
+.photo__tape{position:absolute;z-index:4;width:33%;max-width:72px;height:25px;pointer-events:none;
+  background:linear-gradient(180deg,rgba(255,250,235,.4),rgba(226,216,193,.32));box-shadow:0 2px 5px rgba(0,0,0,.22);
+  -webkit-mask:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent);
+  mask:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent)}
+.photo__tape--l{top:-11px;left:5%;transform:rotate(-25deg)}
+.photo__tape--r{top:-11px;right:5%;transform:rotate(23deg)}
+.photo__tape--b{bottom:13%;right:-9px;width:24%;transform:rotate(-56deg)}
+.photo__stamp{position:absolute;z-index:4;right:9%;top:8%;pointer-events:none;transform:rotate(-11deg);
+  font-family:var(--font-mono);font-size:.54rem;letter-spacing:.1em;color:rgba(176,46,38,.82);
+  border:1.5px solid rgba(176,46,38,.66);border-radius:3px;padding:.18em .42em;mix-blend-mode:multiply}
+.photo__label{position:absolute;z-index:4;left:7%;bottom:20%;pointer-events:none;transform:rotate(-3deg);
+  font-family:var(--font-mono);font-size:.5rem;letter-spacing:.16em;color:#3a342a;background:#e6dabd;
+  padding:.24em .5em;border-radius:2px;box-shadow:0 2px 5px rgba(0,0,0,.25)}
+.photo__sticker{position:absolute;z-index:4;right:-9px;bottom:23%;width:22px;height:22px;border-radius:50%;
+  pointer-events:none;background:radial-gradient(circle at 35% 30%,#ffd84a,var(--yellow) 70%);
+  box-shadow:0 2px 6px rgba(0,0,0,.35),inset 0 1px 2px rgba(255,255,255,.5)}
+
+/* responsive column counts — clean, no messy overlap on small screens */
+@media (max-width:1100px){.scatter{column-count:3}}
+@media (max-width:760px){.scatter{column-count:2;column-gap:14px}.photo{margin-bottom:16px}.photo--tuck{margin-top:0}}
+@media (max-width:430px){.scatter{column-count:1}.photo__card{padding:6% 6% 16%}}
 
 /* «заставка» video backdrop behind the quote + finale */
 .moments__feature{position:relative;isolation:isolate}
@@ -1031,8 +1088,9 @@ b{font-weight:600;color:var(--cream)}
   .album__vinyl{left:62%}
   .albums__hint{display:none}
   .timeline__list li{min-width:70px}
-  .scatter{height:auto;display:flex;flex-wrap:wrap;gap:1rem;justify-content:center;padding:2rem 0}
-  .photo{position:static !important;transform:none !important;width:38vw}
+  .scatter{column-count:2;column-gap:14px;padding:1vh 3vw 4vh}
+  .photo{margin-bottom:16px}
+  .photo--tuck{margin-top:0}
   .doc-stage{height:auto}
   .doc-pin{position:static;height:auto;overflow:visible}
   .doc-track{flex-direction:column;padding-inline:0;gap:8vh;transform:none !important}
@@ -1152,16 +1210,17 @@ b{font-weight:600;color:var(--cream)}
 .js-motion .doc-scene.media-in .scene__videos,.js-motion .doc-scene.media-in .scene__stack,
 .js-motion .doc-scene.media-in .bandphoto{clip-path:inset(0 0 0 0%)}
 
-/* ---- gallery (Moments): mask reveal + hover overlay + FLIP lightbox ---- */
-.js-motion .photo{clip-path:inset(0 0 100% 0)}
-.js-motion .photo.revealed{clip-path:inset(0 0 0% 0);transition:clip-path .8s var(--ease)}
-.js-motion .photo{cursor:pointer}
-.photo__overlay{position:absolute;inset:0;z-index:3;background:rgba(5,5,5,0);transition:background .35s var(--ease)}
-.js-motion .photo:hover .photo__overlay{background:rgba(5,5,5,.3)}
-.lightbox{position:fixed;inset:0;z-index:120;background:rgba(5,5,5,0);pointer-events:none;transition:background .4s ease}
-.lightbox.open{background:rgba(5,5,5,.93);pointer-events:auto}
-.lightbox__img{position:fixed;background-size:cover;background-position:center;border:5px solid #efe7d6;border-bottom-width:18px;
-  box-shadow:0 40px 90px rgba(0,0,0,.75);will-change:top,left,width,height}
+/* ---- gallery (Moments): staggered reveal + rotation-settle, clean lightbox ---- */
+.js-motion .photo{opacity:0;transform:translateY(40px) scale(.93) rotate(calc(var(--rot,0deg) * -1.5));
+  transition:opacity .6s var(--ease),transform .72s cubic-bezier(.34,1.4,.5,1);will-change:transform,opacity}
+.js-motion .photo.revealed{opacity:1;transform:none}
+.lightbox{position:fixed;inset:0;z-index:120;background:rgba(4,4,4,0);pointer-events:none;transition:background .4s ease}
+.lightbox.open{background:rgba(4,4,4,.95);pointer-events:auto;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+.lightbox__pic{position:fixed;display:none;object-fit:contain;border-radius:2px;
+  box-shadow:0 40px 90px rgba(0,0,0,.7);will-change:top,left,width,height}
+.lightbox__cap{position:fixed;bottom:3.4vh;left:0;right:0;z-index:2;text-align:center;opacity:0;pointer-events:none;
+  font-family:'Caveat','Segoe Script',cursive;font-size:1.5rem;color:var(--cream);transition:opacity .3s .2s}
+.lightbox.open .lightbox__cap{opacity:.92}
 .lightbox__close{position:fixed;top:4vh;right:5vw;z-index:2;background:none;border:1px solid var(--cream);color:var(--cream);
   font-family:var(--font-mono);font-size:.78rem;letter-spacing:.2em;padding:.6em 1em;border-radius:3px;opacity:0;transition:opacity .3s}
 .lightbox.open .lightbox__close{opacity:1;transition-delay:.25s}

@@ -46,7 +46,7 @@
     finishLoader();
     if (lenis) lenis.start();
     $$('[data-reveal]').forEach((el) => { el.style.clipPath = 'none'; el.style.opacity = '1'; el.style.transform = 'none'; });
-    $$('.photo').forEach((el) => { el.style.clipPath = 'none'; });
+    $$('.photo').forEach((el) => { el.style.opacity = '1'; el.style.transform = 'none'; });
   }
 
   /* ================================================================
@@ -329,62 +329,74 @@
     const photos = $$('.photo');
     if (!photos.length) return;
     photos.forEach((ph) => {
-      if (!$('.photo__overlay', ph)) {
-        const ov = document.createElement('span'); ov.className = 'photo__overlay'; ov.setAttribute('aria-hidden', 'true');
-        ph.appendChild(ov);
+      const card = $('.photo__card', ph);
+      if (card) {
+        card.setAttribute('tabindex', '0');
+        card.setAttribute('role', 'button');
+        card.setAttribute('aria-label', 'Відкрити: ' + (ph.dataset.tag || 'фото'));
       }
-      ph.setAttribute('tabindex', '0');
-      ph.setAttribute('role', 'button');
     });
+    // staggered reveal + rotation-settle — CSS transitions do the actual motion
     ScrollTrigger.batch('.photo', {
-      start: 'top 90%',
-      onEnter: (batch) => gsap.to(batch, { clipPath: 'inset(0 0 0% 0)', duration: 0.8, stagger: 0.08, ease: 'power3.out', overwrite: 'auto', onStart() { batch.forEach((b) => b.classList.add('revealed')); } }),
+      start: 'top 92%',
+      onEnter: (batch) => batch.forEach((b, i) => setTimeout(() => b.classList.add('revealed'), i * 85)),
     });
     initLightbox(true);
   }
 
-  /* ---- FLIP lightbox: expand from origin, return to place --------- */
+  /* ---- clean fullscreen lightbox: FLIP from the thumb, show the full photo --- */
   function initLightbox(animated) {
     const photos = $$('.photo');
     if (!photos.length) return;
     const box = document.createElement('div');
     box.className = 'lightbox'; box.setAttribute('aria-hidden', 'true');
-    const img = document.createElement('div'); img.className = 'lightbox__img';
+    const pic = document.createElement('img'); pic.className = 'lightbox__pic'; pic.alt = '';
+    const cap = document.createElement('p'); cap.className = 'lightbox__cap';
     const close = document.createElement('button'); close.className = 'lightbox__close'; close.type = 'button';
     close.textContent = 'Закрити ✕'; close.setAttribute('aria-label', 'Закрити');
-    box.appendChild(img); box.appendChild(close); document.body.appendChild(box);
+    box.appendChild(pic); box.appendChild(cap); box.appendChild(close); document.body.appendChild(box);
     let from = null;
 
+    const px = (o) => ({ left: o.left + 'px', top: o.top + 'px', width: o.width + 'px', height: o.height + 'px' });
     function target() {
-      const maxW = Math.min(window.innerWidth * 0.8, window.innerHeight * 0.84 * 0.8);
-      const w = maxW, h = w * 1.25;                  // keep the 4:5 polaroid ratio
+      const ar = (pic.naturalWidth && pic.naturalHeight) ? pic.naturalWidth / pic.naturalHeight : 0.8;
+      const maxW = window.innerWidth * 0.9, maxH = window.innerHeight * 0.84;
+      let w = maxW, h = w / ar;
+      if (h > maxH) { h = maxH; w = h * ar; }
       return { left: (window.innerWidth - w) / 2, top: (window.innerHeight - h) / 2, width: w, height: h };
     }
+    function grow(r) {
+      const t = target();
+      if (animated && window.gsap) gsap.fromTo(pic, { left: r.left, top: r.top, width: r.width, height: r.height }, Object.assign({ duration: 0.55, ease: 'power3.inOut' }, t));
+      else Object.assign(pic.style, px(t));
+    }
     function open(ph) {
-      const bg = ph.style.backgroundImage; if (!bg) return;
+      const imgEl = $('.photo__img', ph);
+      const bg = imgEl && imgEl.style.backgroundImage; if (!bg) return;   // video tiles have no bg → no lightbox
+      const url = bg.slice(bg.indexOf('(') + 1, bg.lastIndexOf(')')).replace(/^["']|["']$/g, '');
       from = ph;
-      const r = ph.getBoundingClientRect();
-      img.style.display = 'block';
-      img.style.backgroundImage = bg;
+      const r = (imgEl || ph).getBoundingClientRect();
+      cap.textContent = ph.dataset.tag || '';
       box.classList.add('open'); box.setAttribute('aria-hidden', 'false');
-      if (window.__lenis) window.__lenis.stop();
-      if (animated && window.gsap) {
-        gsap.fromTo(img, { left: r.left, top: r.top, width: r.width, height: r.height },
-          { left: target().left, top: target().top, width: target().width, height: target().height, duration: 0.6, ease: 'power3.inOut' });
-      } else { Object.assign(img.style, withPx(target())); }
+      pic.style.display = 'block';
+      Object.assign(pic.style, px(r));                  // start exactly over the thumbnail
+      const go = () => grow(r);
+      if (pic.getAttribute('src') !== url) pic.setAttribute('src', url);
+      if (pic.complete && pic.naturalWidth) go(); else pic.onload = go;
+      close.focus();
     }
     function shut() {
       if (!from) { box.classList.remove('open'); return; }
-      const r = from.getBoundingClientRect();
-      const done = () => { box.classList.remove('open'); box.setAttribute('aria-hidden', 'true'); img.style.display = 'none'; if (window.__lenis) window.__lenis.start(); from = null; };
-      if (animated && window.gsap) gsap.to(img, { left: r.left, top: r.top, width: r.width, height: r.height, duration: 0.5, ease: 'power3.inOut', onComplete: done });
+      const r = ($('.photo__img', from) || from).getBoundingClientRect();
+      const done = () => { box.classList.remove('open'); box.setAttribute('aria-hidden', 'true'); pic.style.display = 'none'; from = null; };
+      if (animated && window.gsap) gsap.to(pic, { left: r.left, top: r.top, width: r.width, height: r.height, duration: 0.45, ease: 'power3.inOut', onComplete: done });
       else done();
     }
-    function withPx(o) { return { left: o.left + 'px', top: o.top + 'px', width: o.width + 'px', height: o.height + 'px' }; }
 
     photos.forEach((ph) => {
-      ph.addEventListener('click', () => open(ph));
-      ph.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(ph); } });
+      const hit = $('.photo__card', ph) || ph;
+      hit.addEventListener('click', () => open(ph));
+      hit.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(ph); } });
     });
     close.addEventListener('click', shut);
     box.addEventListener('click', (e) => { if (e.target === box) shut(); });

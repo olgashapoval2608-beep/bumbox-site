@@ -378,55 +378,51 @@
     { f: 'foto-festival', t: 'Фестиваль' },
     { f: 'foto-2004', t: '2004' },
   ];
-  const makeTile = (it) => {
+  // deterministic decoration data → the composition reads as intentional and stays stable on reload
+  const ROTS = [-3.4, 2.6, -1.8, 3.2, -2.5, 1.6, -3.1, 2.2, -1.3, 2.9];
+  const ARS = ['4 / 5', '1 / 1', '4 / 5', '5 / 6', '3 / 4', '4 / 5', '5 / 4', '1 / 1', '3 / 4', '4 / 5'];
+  const STAMPS = ['12·08·04', '03·11·07', '27·06·09', '14·09·12', '08·05·15', '19·02·18', '30·07·21', '05·12·22'];
+  const LABELS = ['АРХІВ', 'ПЛІВКА', 'LIVE', 'ТУР', 'BACKSTAGE', '35 ММ'];
+  const deco = (cls, txt) => { const s = document.createElement('span'); s.className = cls; if (txt) s.textContent = txt; return s; };
+
+  const makeTile = (it, i) => {
     const ph = document.createElement('figure');
     ph.className = it.v ? 'photo photo--video' : 'photo';
     ph.dataset.tag = it.t;
+    ph.style.setProperty('--rot', ROTS[i % ROTS.length] + 'deg');
+    if (i % 5 === 3) ph.classList.add('photo--tuck');   // tuck under the card above → depth + overlap
+    if (i % 7 === 5) ph.classList.add('photo--lift');
+
+    const card = document.createElement('div');
+    card.className = 'photo__card';
+
+    const img = document.createElement('div');
+    img.className = it.v ? 'photo__img photo__img--video' : 'photo__img';
+    img.style.setProperty('--ar', ARS[i % ARS.length]);
     if (it.v) {
       const vid = document.createElement('video');
       vid.src = `assets/${it.f}.mp4`;
       vid.muted = true; vid.loop = true; vid.autoplay = true; vid.playsInline = true;
       vid.setAttribute('playsinline', ''); vid.preload = 'metadata';
-      ph.appendChild(vid);
+      img.appendChild(vid);
     } else {
-      ph.style.backgroundImage = `url(assets/${it.f}.jpg)`;
-      ph.style.backgroundSize = 'cover';
-      ph.style.backgroundPosition = 'center';
+      img.style.backgroundImage = `url(assets/${it.f}.jpg)`;   // photo untouched — only framed
     }
-    ph.addEventListener('mouseenter', () => ph.classList.add('live'));
-    ph.addEventListener('mouseleave', () => ph.classList.remove('live'));
+    card.appendChild(img);
+    card.appendChild(deco('photo__cap', it.t));               // handwritten caption on the frame
+
+    // scrapbook bits — a piece of tape on every card, the rest sprinkled deterministically
+    card.appendChild(deco('photo__tape photo__tape--' + (i % 2 ? 'l' : 'r')));
+    if (i % 3 === 0) card.appendChild(deco('photo__tape photo__tape--b'));
+    if (i % 4 === 1) card.appendChild(deco('photo__stamp', STAMPS[i % STAMPS.length]));
+    if (i % 6 === 2) card.appendChild(deco('photo__label', LABELS[i % LABELS.length]));
+    if (i % 5 === 0) { const sk = deco('photo__sticker'); sk.setAttribute('aria-hidden', 'true'); card.appendChild(sk); }
+
+    ph.appendChild(card);
     return ph;
   };
   if (scatter) {
-    const mobile = innerWidth <= 720;
-    if (mobile) {
-      // CSS lays these out as a wrapping flex wall
-      momentItems.forEach((it) => scatter.appendChild(makeTile(it)));
-    } else {
-      // jittered grid: scattered look, but no tile (or caption) buried under another
-      const cols = innerWidth >= 1000 ? 6 : 4;
-      const W = scatter.clientWidth || 1100;
-      const colW = W / cols;
-      const tileW = Math.min(180, colW * 0.84);
-      const rowH = tileW * 1.25 + 66;          // 4:5 tile + room for the handwritten caption
-      momentItems.forEach((it, i) => {
-        const ph = makeTile(it);
-        const col = i % cols, row = Math.floor(i / cols);
-        const jx = (Math.random() * 0.26 - 0.13) * colW;
-        const jy = (Math.random() * 0.24 - 0.12) * (rowH - tileW * 1.25);
-        const rot = (Math.random() * 13 - 6.5);
-        ph.style.width = tileW + 'px';
-        ph.style.left = (col * colW + (colW - tileW) / 2 + jx) + 'px';
-        ph.style.top = (row * rowH + 18 + jy) + 'px';
-        ph.style.setProperty('--rot', rot.toFixed(1) + 'deg');
-        ph.style.transform = `rotate(${rot.toFixed(1)}deg)`;
-        ph.dataset.rot = rot.toFixed(1);
-        ph.dataset.speed = (0.015 + Math.random() * 0.05).toFixed(3);
-        scatter.appendChild(ph);
-      });
-      const rows = Math.ceil(momentItems.length / cols);
-      scatter.style.height = (rows * rowH + 30) + 'px';
-    }
+    momentItems.forEach((it, i) => scatter.appendChild(makeTile(it, i)));   // CSS columns lay out the wall
   }
 
   // archive marquee (Screen 1) — concert/backstage frames only, no captions
@@ -599,16 +595,6 @@
       updateHeroZoom();
       updateHistoryTrack();
       updateAlbums();
-
-      // moments photo drift
-      if (scatter && innerWidth > 720) {
-        const r = scatter.getBoundingClientRect();
-        const off = (innerHeight - r.top);
-        $$('.photo', scatter).forEach((ph) => {
-          const sp = +ph.dataset.speed || 0;
-          ph.style.transform = `translateY(${-off * sp}px) rotate(${ph.dataset.rot}deg)`;
-        });
-      }
       ticking = false;
     });
   }
