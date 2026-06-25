@@ -291,6 +291,17 @@
     const bar = $('#docProgressBar'), yearEl = $('#docYear'), idxEl = $('#docIndex');
     const labels = scenes.map((s) => { const c = s.querySelector('.scene__chip'); return c ? c.textContent.replace('▶', '').trim() : ''; });
 
+    // segment the progress slider so it reads as transitions between the pages
+    const prog = $('#docProgress');
+    if (prog && scenes.length > 1 && !$('.doc-progress__tick', prog)) {
+      for (let i = 1; i < scenes.length; i++) {
+        const tk = document.createElement('span');
+        tk.className = 'doc-progress__tick';
+        tk.style.left = (i / (scenes.length - 1)) * 100 + '%';
+        prog.appendChild(tk);
+      }
+    }
+
     function update() {
       if (window.innerWidth <= 720) return;
       const total = stage.offsetHeight - window.innerHeight;

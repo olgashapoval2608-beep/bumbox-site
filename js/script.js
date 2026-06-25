@@ -347,42 +347,103 @@
      MOMENTS — scattered photo archive + crowd assembly
      ================================================================= */
   const scatter = $('#scatter');
-  const tags = ['сцена', 'натовп', '2004', 'гурт', 'тур', 'backstage', 'саундчек', 'Київ', 'live', 'архів', 'гастролі', 'фінал'];
-  const momentPhotos = ['concert-big', 'crowd-people', 'band-full', 'concert-club', 'concert-festival',
-    'history-2004-trio', 'history-inna', 'portrait-khlivniuk', 'history-khlivniuk-army', 'portrait-samoylo',
-    'concert-big', 'concert-festival', 'crowd-people', 'band-full'];
-  if (scatter) {
-    const N = innerWidth <= 720 ? 8 : 14;
-    for (let i = 0; i < N; i++) {
-      const ph = document.createElement('figure');
-      ph.className = 'photo';
-      ph.dataset.tag = tags[i % tags.length];
-      ph.style.backgroundImage = `url(assets/${momentPhotos[i % momentPhotos.length]}.jpg)`;
+  // Moments wall — every shot from the "фоточки" folder, captioned by its name; a few videos too.
+  const momentItems = [
+    { f: 'foto-bus', t: 'Автобус' },
+    { f: 'foto-atmosfera', t: 'Атмосфера' },
+    { f: 'foto-pochatok', t: 'Початок' },
+    { f: 'foto-bb', t: 'ББ' },
+    { f: 'foto-basgirl', t: 'Бас-гьорл' },
+    { f: 'video-stari-vystupy', t: 'Старі виступи', v: true },
+    { f: 'foto-vibe', t: 'Вайб' },
+    { f: 'foto-bigshow', t: 'Великий концерт' },
+    { f: 'foto-allofus', t: 'Всі ми' },
+    { f: 'foto-guitarist', t: 'Гітарист' },
+    { f: 'foto-fire', t: 'Вогонь' },
+    { f: 'video-divka', t: 'Дівка', v: true },
+    { f: 'foto-club', t: 'Клуб' },
+    { f: 'foto-concerts', t: 'Концерти' },
+    { f: 'foto-krasa', t: 'Краса' },
+    { f: 'foto-lyulya', t: 'Люля' },
+    { f: 'foto-mukha', t: 'Муха' },
+    { f: 'city-team', t: 'Команда', v: true },
+    { f: 'foto-dorozhka', t: 'На дорожку' },
+    { f: 'foto-pupupu', t: 'Пу-пу-пу' },
+    { f: 'foto-roztyazhka', t: 'Розтяжка' },
+    { f: 'foto-spory', t: 'Спори' },
+    { f: 'foto-fan', t: 'Фан-фото' },
+    { f: 'city-kontsert', t: 'Концерт', v: true },
+    { f: 'foto-chb', t: 'ЧБ' },
+    { f: 'foto-chill', t: 'Чілл' },
+    { f: 'foto-festival', t: 'Фестиваль' },
+    { f: 'foto-2004', t: '2004' },
+  ];
+  const makeTile = (it) => {
+    const ph = document.createElement('figure');
+    ph.className = it.v ? 'photo photo--video' : 'photo';
+    ph.dataset.tag = it.t;
+    if (it.v) {
+      const vid = document.createElement('video');
+      vid.src = `assets/${it.f}.mp4`;
+      vid.muted = true; vid.loop = true; vid.autoplay = true; vid.playsInline = true;
+      vid.setAttribute('playsinline', ''); vid.preload = 'metadata';
+      ph.appendChild(vid);
+    } else {
+      ph.style.backgroundImage = `url(assets/${it.f}.jpg)`;
       ph.style.backgroundSize = 'cover';
       ph.style.backgroundPosition = 'center';
-      if (innerWidth > 720) {
-        const left = 4 + Math.random() * 80;
-        const top = 2 + Math.random() * 64;
-        const rot = (Math.random() * 24 - 12).toFixed(1);
-        ph.style.left = left + '%';
-        ph.style.top = top + '%';
-        ph.style.setProperty('--rot', rot + 'deg');
-        ph.style.transform = `rotate(${rot}deg)`;
-        ph.dataset.rot = rot;
-        ph.dataset.speed = (0.04 + Math.random() * 0.12).toFixed(3);
-      }
-      // hover "comes alive"
-      ph.addEventListener('mouseenter', () => ph.classList.add('live'));
-      ph.addEventListener('mouseleave', () => ph.classList.remove('live'));
-      scatter.appendChild(ph);
+    }
+    ph.addEventListener('mouseenter', () => ph.classList.add('live'));
+    ph.addEventListener('mouseleave', () => ph.classList.remove('live'));
+    return ph;
+  };
+  if (scatter) {
+    const mobile = innerWidth <= 720;
+    if (mobile) {
+      // CSS lays these out as a wrapping flex wall
+      momentItems.forEach((it) => scatter.appendChild(makeTile(it)));
+    } else {
+      // jittered grid: scattered look, but no tile (or caption) buried under another
+      const cols = innerWidth >= 1000 ? 6 : 4;
+      const W = scatter.clientWidth || 1100;
+      const colW = W / cols;
+      const tileW = Math.min(180, colW * 0.84);
+      const rowH = tileW * 1.25 + 66;          // 4:5 tile + room for the handwritten caption
+      momentItems.forEach((it, i) => {
+        const ph = makeTile(it);
+        const col = i % cols, row = Math.floor(i / cols);
+        const jx = (Math.random() * 0.26 - 0.13) * colW;
+        const jy = (Math.random() * 0.24 - 0.12) * (rowH - tileW * 1.25);
+        const rot = (Math.random() * 13 - 6.5);
+        ph.style.width = tileW + 'px';
+        ph.style.left = (col * colW + (colW - tileW) / 2 + jx) + 'px';
+        ph.style.top = (row * rowH + 18 + jy) + 'px';
+        ph.style.setProperty('--rot', rot.toFixed(1) + 'deg');
+        ph.style.transform = `rotate(${rot.toFixed(1)}deg)`;
+        ph.dataset.rot = rot.toFixed(1);
+        ph.dataset.speed = (0.015 + Math.random() * 0.05).toFixed(3);
+        scatter.appendChild(ph);
+      });
+      const rows = Math.ceil(momentItems.length / cols);
+      scatter.style.height = (rows * rowH + 30) + 'px';
     }
   }
 
-  // merch archive strip — real backstage/concert frames
-  const archiveImgs = ['concert-festival', 'crowd-people', 'concert-club', 'band-full', 'concert-big', 'history-banner'];
-  $$('.archive__ph').forEach((el, i) => {
-    el.style.backgroundImage = `url(assets/${archiveImgs[i % archiveImgs.length]}.jpg)`;
-  });
+  // archive marquee (Screen 1) — concert/backstage frames only, no captions
+  const archiveRow = $('#archiveRow');
+  if (archiveRow) {
+    const archiveImgs = ['foto-bigshow', 'foto-concerts', 'foto-festival', 'foto-allofus', 'foto-fire',
+      'foto-club', 'foto-bus', 'foto-fan', 'foto-vibe', 'foto-atmosfera', 'concert-big', 'concert-festival'];
+    archiveRow.textContent = '';
+    for (let pass = 0; pass < 2; pass++) {           // duplicate the set so the marquee loops seamlessly
+      archiveImgs.forEach((name) => {
+        const el = document.createElement('span');
+        el.className = 'archive__ph';
+        el.style.backgroundImage = `url(assets/${name}.jpg)`;
+        archiveRow.appendChild(el);
+      });
+    }
+  }
 
   // build crowd (silhouette of dots that light up)
   const crowd = $('#crowd');

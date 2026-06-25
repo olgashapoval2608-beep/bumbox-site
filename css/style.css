@@ -529,6 +529,13 @@ b{font-weight:600;color:var(--cream)}
 .member-card .mc__img:not(.img-missing)+i{display:none}
 .member-card:hover .mc__img{transform:scale(2.5) translateY(-6px);border-color:var(--yellow);
   box-shadow:0 16px 34px rgba(0,0,0,.75)}
+/* compact single row (2004 lineup) — keeps the «2004» chip + scene readable */
+.member-cards--row{flex-wrap:nowrap;gap:.5rem}
+.member-cards--row .member-card{flex:1 1 0;min-width:0;align-items:center;text-align:center;
+  padding:.5rem .45rem;font-size:.74rem}
+.member-cards--row .member-card i{font-size:.95rem}
+.member-cards--row .mc__img{width:44px;height:44px}
+.member-cards--row .member-card small{font-size:.5rem;letter-spacing:.1em}
 
 /* stat block */
 .stat-block{display:flex;gap:1.8rem;margin:1.4rem 0 .4rem;flex-wrap:wrap}
@@ -936,18 +943,22 @@ b{font-weight:600;color:var(--cream)}
   font-family:'Caveat','Segoe Script',cursive;font-size:.8rem;color:#3a342c}
 .photo:hover{transform:scale(1.12) rotate(0deg) !important;z-index:20;filter:grayscale(0);
   box-shadow:0 26px 60px rgba(0,0,0,.8),0 0 30px rgba(245,197,24,.2)}
-.photo.live::before{content:'● REC';position:absolute;top:6px;left:6px;font-family:var(--font-mono);
+.photo.live::before{content:'● REC';position:absolute;top:6px;left:6px;z-index:3;font-family:var(--font-mono);
   font-size:.5rem;color:var(--red);letter-spacing:.1em}
+/* video tiles inside the Moments wall */
+.photo--video video{position:absolute;inset:0;z-index:0;width:100%;height:100%;object-fit:cover;background:#0c0b0a}
+.photo--video::after{z-index:3}
 
 /* «заставка» video backdrop behind the quote + finale */
 .moments__feature{position:relative;isolation:isolate}
 .moments__bg{position:absolute;inset:0;z-index:0;width:100%;height:100%;object-fit:cover;
-  opacity:.3;filter:grayscale(.2)}
+  opacity:.72;filter:saturate(1.06) brightness(1.05)}
 .moments__feature::after{content:'';position:absolute;inset:0;z-index:0;pointer-events:none;
-  background:linear-gradient(180deg,#050505,rgba(5,5,5,.5) 16%,rgba(5,5,5,.5) 62%,#050505)}
+  background:linear-gradient(180deg,#050505,rgba(5,5,5,.3) 18%,rgba(5,5,5,.3) 60%,#050505)}
 .moments__quote{position:relative;z-index:1;text-align:center;font-family:var(--font-display);
   font-size:clamp(1.6rem,4.5vw,3.4rem);line-height:1.05;color:var(--cream);
-  max-width:18ch;margin:0 auto;padding:14vh 1rem;text-transform:uppercase}
+  max-width:18ch;margin:0 auto;padding:14vh 1rem;text-transform:uppercase;
+  text-shadow:0 2px 26px rgba(0,0,0,.6),0 1px 4px rgba(0,0,0,.7)}
 
 .moments__finale{position:relative;z-index:1;height:120vh}
 .crowd{position:sticky;top:0;height:100vh;display:flex;flex-wrap:wrap;align-content:flex-end;
@@ -1128,9 +1139,11 @@ b{font-weight:600;color:var(--cream)}
   text-shadow:0 0 22px rgba(245,197,24,.4)}
 .doc-hud__count{font-size:.7rem;letter-spacing:.24em;color:var(--muted);text-transform:uppercase}
 .doc-hud__count b{color:var(--cream)}
-.doc-progress{position:absolute;bottom:6vh;left:50%;transform:translateX(-50%);z-index:6;width:min(440px,66vw);height:2px;
-  background:rgba(245,197,24,.14);border-radius:2px;overflow:hidden;pointer-events:none}
-.doc-progress i{display:block;height:100%;width:8%;background:var(--yellow);box-shadow:0 0 10px var(--yellow);border-radius:2px}
+.doc-progress{position:absolute;bottom:6vh;left:50%;transform:translateX(-50%);z-index:6;width:min(460px,68vw);height:4px;
+  background:rgba(245,197,24,.16);border-radius:3px;overflow:hidden;pointer-events:none}
+.doc-progress i{display:block;height:100%;width:8%;background:var(--yellow);box-shadow:0 0 10px var(--yellow);border-radius:3px}
+/* page-transition ticks — segment the slider so each scene reads as a page */
+.doc-progress__tick{position:absolute;top:-1px;bottom:-1px;width:2px;background:#050505;transform:translateX(-1px)}
 /* one-time clip-path reveal of scene media (revealed when the section enters) */
 .js-motion .doc-scene .scene__media,.js-motion .doc-scene .scene__video,
 .js-motion .doc-scene .scene__videos,.js-motion .doc-scene .scene__stack,.js-motion .doc-scene .bandphoto{

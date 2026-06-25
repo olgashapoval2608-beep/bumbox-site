@@ -61,12 +61,13 @@
     <a href="#hero" class="topnav__logo" data-cursor="▶">БУМБОКС</a>
     <ul class="topnav__list" id="navList">
       <span class="topnav__indicator" id="navIndicator" aria-hidden="true"></span>
-      <li><a href="#hero"    class="topnav__item is-active"><b>00</b><span>Hero</span></a></li>
+      <li><a href="#hero"    class="topnav__item is-active"><b>00</b><span>Головний</span></a></li>
       <li><a href="#history" class="topnav__item"><b>01</b><span>Історія</span></a></li>
       <li><a href="#albums"  class="topnav__item"><b>02</b><span>Альбоми</span></a></li>
       <li><a href="#tours"   class="topnav__item"><b>03</b><span>Концерти</span></a></li>
       <li><a href="#merch"   class="topnav__item"><b>04</b><span>Мерч</span></a></li>
-      <li><a href="#footer"  class="topnav__item"><b>05</b><span>Контакти</span></a></li>
+      <li><a href="#moments" class="topnav__item"><b>05</b><span>Моменти</span></a></li>
+      <li><a href="#footer"  class="topnav__item"><b>06</b><span>Контакти</span></a></li>
     </ul>
     <div class="topnav__actions">
       <a href="#tours" class="topnav__cta" data-cursor="🎫">🎫 Квитки</a>
@@ -188,10 +189,6 @@
     <!-- documentary scenes — horizontal timeline driven by vertical scroll -->
     <div class="doc-stage" id="docStage">
       <div class="doc-pin">
-        <div class="doc-hud" aria-hidden="true">
-          <span class="doc-hud__year" id="docYear">2004</span>
-          <span class="doc-hud__count"><b id="docIndex">01</b> / 06</span>
-        </div>
         <div class="doc-progress" id="docProgress" aria-hidden="true"><i id="docProgressBar"></i></div>
         <div class="doc-track" id="docTrack" role="region" aria-label="Таймлайн історії">
 
@@ -217,7 +214,7 @@
             <div><b>0</b><span>продюсерів</span></div>
           </div>
           <p class="scene__note">Усе почалося тут.</p>
-          <div class="member-cards">
+          <div class="member-cards member-cards--row">
             <span class="member-card"><img class="mc__img" src="assets/portrait-khlivniuk.jpg" alt="Андрій Хливнюк" onerror="this.classList.add('img-missing')"><i>👤</i>Андрій Хливнюк<small>вокал</small></span>
             <span class="member-card"><img class="mc__img" src="assets/portrait-samoylo.jpg" alt="Андрій Самойло" onerror="this.classList.add('img-missing')"><i>👤</i>Андрій «Муха» Самойло<small>гітара</small></span>
             <span class="member-card"><img class="mc__img" src="assets/portrait-matiyuk.jpg" alt="Валентин Матіюк" onerror="this.classList.add('img-missing')"><i>👤</i>Валентин Матіюк<small>DJ</small></span>
@@ -265,8 +262,8 @@
       <!-- 2018 -->
       <article class="doc-scene doc-scene--rev reveal">
         <figure class="scene__media scene__media--color">
-          <img src="assets/history-samoylo.jpg" alt="Бумбокс, 2018" onerror="this.classList.add('img-missing')">
-          <span class="scene__ph">assets/history-samoylo.jpg</span>
+          <img src="assets/history-muha-pishov.jpg" alt="Андрій «Муха» Самойло на сцені" onerror="this.classList.add('img-missing')">
+          <span class="scene__ph">assets/history-muha-pishov.jpg</span>
         </figure>
         <div class="scene__body">
           <span class="scene__chip scene__chip--red">▶ 2018</span>
@@ -642,18 +639,7 @@
 
     <!-- archive strip -->
     <div class="archive reveal" aria-hidden="true">
-      <div class="archive__row" id="archiveRow">
-        <span class="archive__ph">сцена</span>
-        <span class="archive__ph">натовп</span>
-        <span class="archive__ph">саундчек</span>
-        <span class="archive__ph">гастролі</span>
-        <span class="archive__ph">автобус</span>
-        <span class="archive__ph">гримерка</span>
-        <span class="archive__ph">сцена</span>
-        <span class="archive__ph">натовп</span>
-        <span class="archive__ph">саундчек</span>
-        <span class="archive__ph">гастролі</span>
-      </div>
+      <div class="archive__row" id="archiveRow"><!-- frames injected by script.js (no captions) --></div>
     </div>
   </section>
 
