@@ -1005,13 +1005,13 @@ b{font-weight:600;color:var(--cream)}
 .doc-progress{position:absolute;bottom:6vh;left:50%;transform:translateX(-50%);z-index:6;width:min(440px,66vw);height:2px;
   background:rgba(245,197,24,.14);border-radius:2px;overflow:hidden;pointer-events:none}
 .doc-progress i{display:block;height:100%;width:8%;background:var(--yellow);box-shadow:0 0 10px var(--yellow);border-radius:2px}
-/* clip-path reveal of scene media when its card centers */
+/* one-time clip-path reveal of scene media (revealed when the section enters) */
 .js-motion .doc-scene .scene__media,.js-motion .doc-scene .scene__video,
 .js-motion .doc-scene .scene__videos,.js-motion .doc-scene .scene__stack,.js-motion .doc-scene .bandphoto{
   clip-path:inset(0 0 0 100%);transition:clip-path .9s var(--ease)}
-.js-motion .doc-scene.is-center .scene__media,.js-motion .doc-scene.is-center .scene__video,
-.js-motion .doc-scene.is-center .scene__videos,.js-motion .doc-scene.is-center .scene__stack,
-.js-motion .doc-scene.is-center .bandphoto{clip-path:inset(0 0 0 0%)}
+.js-motion .doc-scene.media-in .scene__media,.js-motion .doc-scene.media-in .scene__video,
+.js-motion .doc-scene.media-in .scene__videos,.js-motion .doc-scene.media-in .scene__stack,
+.js-motion .doc-scene.media-in .bandphoto{clip-path:inset(0 0 0 0%)}
 .js-motion .doc-scene .scene__body{transform:translateX(var(--par,0px))}   /* text/media parallax */
 
 /* ---- gallery (Moments): mask reveal + hover overlay + FLIP lightbox ---- */

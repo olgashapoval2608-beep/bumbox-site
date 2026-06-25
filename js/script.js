@@ -482,7 +482,6 @@
     const k = Math.min(1, p * 2.5);                        // flatten the tilt early
     boombox.style.transform = `perspective(${1400 + p * 4000}px) rotateX(${6 * (1 - k)}deg) rotateY(${-7 * (1 - k)}deg) scale(${1 + p * 1.4})`;
     boombox.style.opacity = String(Math.max(0, 1 - p / 0.5));
-    boombox.style.filter = `blur(${(p * 6).toFixed(2)}px) drop-shadow(0 40px 60px rgba(0,0,0,.7))`;   // soft defocus as it dissolves
     // ONE photo grows continuously from cassette size → full screen (eased, no jump)
     if (heroPhoto) {
       const g = Math.min(1, p / 0.8);                      // constant-rate growth → full by 80% (gradual, no jump)

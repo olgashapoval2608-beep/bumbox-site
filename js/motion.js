@@ -33,6 +33,11 @@
   gsap.registerPlugin(ScrollTrigger);
   root.classList.add('js-motion');
 
+  // Lenis smoothing fights the direct-scroll-mapped sticky zoom zones (hero / history /
+  // albums) and made scrolling feel glitchy, so it is off by default. Native scrolling
+  // keeps those scroll-jacked sections crisp; all GSAP/ScrollTrigger effects below work
+  // on native scroll. Flip to true to re-enable buttery smooth-scroll.
+  const USE_LENIS = false;
   let lenis = null;
 
   /* ---- fail-safe: if any setup throws, reveal everything ----------- */
@@ -47,12 +52,14 @@
   /* ================================================================
      LENIS smooth scrolling (synced with ScrollTrigger + GSAP ticker)
      ================================================================ */
-  if (Lenis) {
+  if (Lenis && USE_LENIS) {
     lenis = new Lenis({
-      duration: 1.15,
+      duration: 0.9,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       smoothWheel: true,
-      touchMultiplier: 1.6,
+      wheelMultiplier: 0.9,
+      smoothTouch: false,        // native scrolling on touch — avoids mobile jank
+      touchMultiplier: 1.5,
     });
     window.__lenis = lenis;
     lenis.on('scroll', ScrollTrigger.update);
@@ -134,31 +141,29 @@
     if (cue) gsap.set(cue, { opacity: 0 });
     if (spot) gsap.set(spot, { scale: 1.18, opacity: 0.55 });
 
-    if (lenis) lenis.stop();                       // lock scroll during the intro
+    if (lenis) lenis.stop();                       // briefly lock scroll during the intro
 
-    const tl = gsap.timeline({
-      defaults: { ease: 'power3.out' },
-      onComplete() { finishLoader(); if (lenis) lenis.start(); ScrollTrigger.refresh(); },
-    });
+    const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
 
     // 1) dark → logo appears → logo scales slightly
-    tl.to(logo, { opacity: 1, duration: 0.6 })
-      .fromTo(logo, { scale: 0.95 }, { scale: 1.07, duration: 1.05, ease: 'power2.inOut' }, '<')
-      .to(barWrap, { opacity: 1, duration: 0.3 }, '<')
-      .to(bar, { width: '100%', duration: 1.0, ease: 'power1.inOut' }, '<')
-      // 2) loader lifts; hero opens with blur-to-clear + background zoom
-      .to(loader, { opacity: 0, duration: 0.7, ease: 'power2.inOut' }, '+=0.12')
-      .fromTo(heroInner, { filter: 'blur(14px)', scale: 1.04 }, { filter: 'blur(0px)', scale: 1, duration: 1.15 }, '<')
-      .to(spot, { scale: 1, opacity: 1, duration: 1.8, ease: 'power2.out' }, '<')
-      // 3) hero entrance: eyebrow, title letters, subtitle words, buttons
-      .to(eyebrow, { opacity: 1, y: 0, duration: 0.5 }, '-=0.8')
-      .to(chars, { opacity: 1, yPercent: 0, duration: 0.7, stagger: 0.045 }, '-=0.55')
-      .to(words, { opacity: 1, yPercent: 0, duration: 0.5, stagger: 0.07 }, '-=0.35')
-      .to(ctas, { opacity: 1, y: 0, duration: 0.5, stagger: 0.12 }, '-=0.5')   // buttons appear early
-      .to(cue, { opacity: 1, duration: 0.5 }, '-=0.2');
+    tl.to(logo, { opacity: 1, duration: 0.5 })
+      .fromTo(logo, { scale: 0.95 }, { scale: 1.06, duration: 0.8, ease: 'power2.inOut' }, '<')
+      .to(barWrap, { opacity: 1, duration: 0.25 }, '<')
+      .to(bar, { width: '100%', duration: 0.8, ease: 'power1.inOut' }, '<')
+      // 2) loader lifts — UNLOCK interaction immediately so the page never feels stuck
+      .to(loader, { opacity: 0, duration: 0.55, ease: 'power2.inOut' }, '+=0.05')
+      .add(() => { finishLoader(); if (lenis) lenis.start(); ScrollTrigger.refresh(); })
+      // 3) hero opens with blur-to-clear + background zoom, then the entrance
+      .fromTo(heroInner, { filter: 'blur(12px)', scale: 1.03 }, { filter: 'blur(0px)', scale: 1, duration: 0.9 }, '<')
+      .to(spot, { scale: 1, opacity: 1, duration: 1.4, ease: 'power2.out' }, '<')
+      .to(eyebrow, { opacity: 1, y: 0, duration: 0.45 }, '<+0.1')
+      .to(chars, { opacity: 1, yPercent: 0, duration: 0.6, stagger: 0.04 }, '<+0.05')
+      .to(words, { opacity: 1, yPercent: 0, duration: 0.45, stagger: 0.06 }, '-=0.3')
+      .to(ctas, { opacity: 1, y: 0, duration: 0.45, stagger: 0.1 }, '-=0.35')   // buttons appear early
+      .to(cue, { opacity: 1, duration: 0.4 }, '-=0.2');
 
     // hard fallback in case the timeline is interrupted
-    setTimeout(() => { if (loader && !loader.classList.contains('is-done')) { finishLoader(); if (lenis) lenis.start(); } }, 4500);
+    setTimeout(() => { if (loader && !loader.classList.contains('is-done')) { finishLoader(); if (lenis) lenis.start(); } }, 2500);
 
     // hero mouse parallax (spot + copy) — never touches the boombox (script.js owns it)
     if (fine) {
@@ -287,6 +292,7 @@
     const bar = $('#docProgressBar'), yearEl = $('#docYear'), idxEl = $('#docIndex');
     const labels = scenes.map((s) => { const c = s.querySelector('.scene__chip'); return c ? c.textContent.replace('▶', '').trim() : ''; });
 
+    const bodies = scenes.map((s) => s.querySelector('.scene__body'));
     function update() {
       if (window.innerWidth <= 720) return;
       const total = stage.offsetHeight - window.innerHeight;
@@ -296,15 +302,18 @@
       if (ci < 0) ci = Math.round(p * (scenes.length - 1));
       if (yearEl && labels[ci]) yearEl.textContent = labels[ci];
       if (idxEl) idxEl.textContent = String(ci + 1).padStart(2, '0');
-      const mid = window.innerWidth / 2;
-      scenes.forEach((s) => {
-        if (s.classList.contains('is-center')) s.classList.add('seen');
-        const body = s.querySelector('.scene__body');
-        if (body) { const r = s.getBoundingClientRect(); body.style.setProperty('--par', ((r.left + r.width / 2 - mid) * 0.05).toFixed(1) + 'px'); }
-      });
+      // subtle text/media parallax only near the centre (cheap: one rect read)
+      const c = scenes[ci]; const body = bodies[ci];
+      if (c && body) { const r = c.getBoundingClientRect(); body.style.setProperty('--par', ((r.left + r.width / 2 - window.innerWidth / 2) * 0.04).toFixed(1) + 'px'); }
     }
     ScrollTrigger.create({ trigger: stage, start: 'top top', end: 'bottom bottom', onUpdate: update, onRefresh: update });
     update();
+
+    // one-time cinematic mask reveal of all scene media when the section enters
+    ScrollTrigger.create({
+      trigger: '#history', start: 'top 80%', once: true,
+      onEnter: () => scenes.forEach((s, i) => setTimeout(() => s.classList.add('media-in'), i * 120)),
+    });
   }
 
   /* ================================================================
