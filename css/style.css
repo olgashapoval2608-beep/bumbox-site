@@ -745,7 +745,94 @@ b{font-weight:600;color:var(--cream)}
    5. MERCH
    ================================================================= */
 .merch{padding:16vh 0 12vh;background:linear-gradient(180deg,#0a0807,#171009 55%,#0d0a08)}
-.merch__head{text-align:center;margin-bottom:7vh}
+.merch__head{text-align:center;margin-bottom:4vh}
+
+/* =================================================================
+   MERCH — editorial band-shop cards + filter tabs + donation card
+   ================================================================= */
+.merch__filters{display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center;margin-bottom:4.5vh}
+.mtab{font-family:var(--font-mono);font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);
+  background:rgba(255,255,255,.02);border:1px solid #2c2824;border-radius:40px;padding:.65em 1.25em;min-height:42px;
+  cursor:pointer;transition:color .25s var(--ease),background .25s var(--ease),border-color .25s var(--ease);white-space:nowrap}
+.mtab:hover{color:var(--cream);border-color:rgba(245,197,24,.45)}
+.mtab.is-active{color:#1a1407;background:var(--yellow);border-color:var(--yellow);font-weight:600}
+.mtab--ua{border-color:rgba(43,108,255,.5)}
+.mtab--ua.is-active{background:linear-gradient(90deg,#2b6cff,#ffd400);border-color:transparent;color:#0a0a0a}
+
+.merch__grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(238px,1fr));gap:1.5rem;
+  align-items:start;perspective:1400px}
+
+.mcard{position:relative;display:flex;flex-direction:column;gap:1rem;padding:1rem;border-radius:14px;
+  background:linear-gradient(160deg,#1b1714,#0c0b0a);border:1px solid #2a2520;isolation:isolate;
+  box-shadow:0 20px 46px rgba(0,0,0,.5);transform-style:preserve-3d;will-change:transform;
+  transition:transform .35s var(--ease),box-shadow .35s var(--ease),border-color .35s var(--ease)}
+/* paper / grain texture */
+.mcard::after{content:'';position:absolute;inset:0;z-index:6;pointer-events:none;border-radius:14px;opacity:.06;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.mcard:hover,.mcard:focus-visible{border-color:rgba(245,197,24,.5);box-shadow:0 30px 72px rgba(0,0,0,.65),0 0 42px rgba(245,197,24,.16)}
+
+/* layered background behind the product photo */
+.mcard__media{position:relative;border-radius:10px;overflow:hidden;padding:18px 14px;border:1px solid #322c25;
+  background:radial-gradient(120% 95% at 28% 0,rgba(245,197,24,.12),transparent 55%),linear-gradient(160deg,#221e19,#0c0b0a)}
+.mcard__media::before{content:'';position:absolute;inset:0;z-index:1;opacity:.4;pointer-events:none;
+  background:repeating-linear-gradient(45deg,rgba(245,197,24,.05) 0 2px,transparent 2px 13px)}
+
+.mcard__photo{position:relative;z-index:2;width:100%;max-width:212px;margin:0 auto;aspect-ratio:4/5;border-radius:6px;overflow:hidden;
+  border:1px solid rgba(255,255,255,.08);box-shadow:0 14px 30px rgba(0,0,0,.55);transition:transform .5s var(--ease)}
+.mcard__photo img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(1.03)}
+.mcard:hover .mcard__photo,.mcard:focus-visible .mcard__photo{transform:translateY(-8px)}   /* image lift */
+
+/* graphic (print) cards for apparel without a photo */
+.mcard__photo--graphic{display:grid;place-items:center;text-align:center;gap:.3rem;
+  background:radial-gradient(120% 90% at 50% 0,#2a2520,#0b0a08);border-color:#3a342c}
+.mcard__photo--graphic.mcard__photo--alt{background:radial-gradient(120% 90% at 50% 100%,#241a10,#0b0a08)}
+.mcard__print{font-family:var(--font-display);font-size:2.3rem;line-height:.82;letter-spacing:.02em;color:transparent;
+  -webkit-text-stroke:1.2px rgba(239,231,214,.6);text-shadow:0 0 26px rgba(245,197,24,.18)}
+.mcard__print-sub{font-family:var(--font-mono);font-size:.54rem;letter-spacing:.22em;text-transform:uppercase;color:var(--yellow);opacity:.8}
+
+/* editorial details: product code, category tag, sticker */
+.mcard__code{position:absolute;top:10px;left:12px;z-index:4;font-family:var(--font-mono);font-size:.58rem;letter-spacing:.2em;color:var(--yellow);opacity:.85}
+.mcard__tag{position:absolute;top:9px;right:11px;z-index:4;font-family:var(--font-mono);font-size:.56rem;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--cream);background:rgba(8,8,8,.6);border:1px solid rgba(245,197,24,.4);border-radius:3px;padding:.32em .6em;transition:transform .35s var(--ease)}
+.mcard:hover .mcard__tag,.mcard:focus-visible .mcard__tag{transform:translateY(-3px)}   /* label movement */
+.mcard__sticker{position:absolute;bottom:12px;left:12px;z-index:4;font-family:var(--font-mono);font-size:.54rem;font-weight:700;letter-spacing:.08em;
+  color:#fff;background:var(--red);padding:.32em .55em;border-radius:2px;transform:rotate(-7deg)}
+.mcard__sticker--y{background:var(--yellow);color:#1a1407}
+
+.mcard__foot{display:flex;flex-direction:column;gap:.5rem;padding:0 .35rem .25rem}
+.mcard__name{font-family:var(--font-display);font-size:1.45rem;line-height:.95;text-transform:uppercase}
+.mcard__line{width:34px;height:2px;background:var(--yellow);box-shadow:0 0 10px rgba(245,197,24,.6)}
+.mcard__meta{font-family:var(--font-mono);font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+
+/* asymmetry — vary accents so the grid isn't a flat row of identical tiles */
+.mcard:nth-child(3n) .mcard__sticker{transform:rotate(6deg)}
+.mcard:nth-child(2n) .mcard__media{padding-top:26px}
+.mcard:nth-child(4n) .mcard__photo{margin-left:auto;margin-right:8%}
+.mcard:nth-child(3n+1) .mcard__photo{margin-left:8%;margin-right:auto}
+.mcard:nth-child(2n) .mcard__line{align-self:flex-end}
+
+/* hover tilt (JS sets the transform on desktop) */
+.merch__grid .mcard{backface-visibility:hidden}
+
+/* filtered-out cards */
+.mcard.is-hidden{display:none}
+
+/* special donation card — emotional, blue/yellow, stronger hierarchy */
+.mcard--donate{grid-column:span 2;justify-content:center;gap:1.1rem;padding:2.2rem 2rem;
+  background:linear-gradient(140deg,rgba(43,108,255,.18),#0c0b0a 58%);border:1px solid rgba(43,108,255,.45)}
+.mcard--donate:hover,.mcard--donate:focus-visible{border-color:rgba(91,157,255,.7);box-shadow:0 30px 72px rgba(0,0,0,.65),0 0 50px rgba(43,108,255,.28)}
+.donate__glow{position:absolute;inset:0;z-index:0;pointer-events:none;border-radius:14px;
+  background:radial-gradient(70% 95% at 100% 0,rgba(43,108,255,.3),transparent 60%),radial-gradient(70% 95% at 0 100%,rgba(245,197,24,.22),transparent 60%)}
+.mcard--donate>*{position:relative;z-index:1}
+.mcard__code--ua{color:#7fb0ff}
+.mcard__tag--ua{position:static;align-self:flex-start;border-color:rgba(91,157,255,.6);color:#dbe7ff;background:rgba(43,108,255,.18)}
+.donate__title{font-family:var(--font-display);font-size:clamp(2rem,4vw,3.1rem);line-height:.95;text-transform:uppercase;
+  background:linear-gradient(90deg,#6aa6ff,#ffd400);-webkit-background-clip:text;background-clip:text;color:transparent}
+.donate__text{max-width:52ch;color:var(--cream);line-height:1.65;font-size:1.02rem}
+.donate__btn{align-self:flex-start;background:linear-gradient(90deg,#2b6cff,#ffd400);border:none;color:#0a0a0a;font-weight:700}
+.donate__btn:hover{box-shadow:0 0 34px rgba(91,157,255,.5);transform:translateY(-2px)}
+@media (max-width:720px){.mcard--donate{grid-column:1/-1}}
+
 .merch__table{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:2rem;
   perspective:1200px;padding:1rem;border-radius:10px;
   background:radial-gradient(60% 80% at 50% 0,rgba(217,122,52,.14),transparent 70%)}

@@ -438,6 +438,33 @@
   }
 
   /* =================================================================
+     MERCH — category filter tabs + editorial card hover tilt
+     ================================================================= */
+  const mtabs = $$('.mtab');
+  const mcards = $$('.mcard');
+  if (mtabs.length && mcards.length) {
+    mtabs.forEach((tab) => {
+      tab.addEventListener('click', () => {
+        const f = tab.dataset.filter;
+        mtabs.forEach((t) => { const on = t === tab; t.classList.toggle('is-active', on); t.setAttribute('aria-selected', String(on)); });
+        mcards.forEach((c) => c.classList.toggle('is-hidden', f !== 'all' && c.dataset.cat !== f));
+      });
+    });
+    // 3D hover tilt (desktop, motion-safe)
+    if (!isTouch && !reduceMotion) {
+      mcards.forEach((c) => {
+        c.addEventListener('mousemove', (e) => {
+          const r = c.getBoundingClientRect();
+          const px = (e.clientX - r.left) / r.width - 0.5;
+          const py = (e.clientY - r.top) / r.height - 0.5;
+          c.style.transform = `perspective(900px) rotateY(${px * 6}deg) rotateX(${-py * 6}deg) translateZ(6px)`;
+        });
+        c.addEventListener('mouseleave', () => { c.style.transform = ''; });
+      });
+    }
+  }
+
+  /* =================================================================
      HERO — scroll-zoom into the cassette → TRACK 01 / ІСТОРІЯ
      ================================================================= */
   const heroZone = $('#hero');

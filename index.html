@@ -537,33 +537,113 @@
     <div class="container merch__head reveal">
       <p class="track-tag">TRACK 04 / МЕРЧ</p>
       <h2 class="display-h">Забери музику додому</h2>
-      <p class="muted">Не сувеніри. Частинки історії.</p>
+      <p class="muted">Офіційний мерч гурту · колекція ’26</p>
     </div>
 
-    <div class="container merch__table reveal" id="merchTable">
-      <article class="item item--photo" tabindex="0">
-        <div class="item__photo"><img src="assets/merch-tshirt.jpg" alt="Футболка «Живий»" loading="lazy" onerror="this.closest('.item').classList.add('img-missing')"></div>
-        <p class="item__name">Футболка «Живий»</p>
+    <!-- category filter tabs -->
+    <div class="container merch__filters reveal" role="tablist" aria-label="Категорії мерчу">
+      <button class="mtab is-active" data-filter="all" role="tab" aria-selected="true">Усе</button>
+      <button class="mtab" data-filter="odiah" role="tab" aria-selected="false">Одяг</button>
+      <button class="mtab" data-filter="vinyl" role="tab" aria-selected="false">Вініл</button>
+      <button class="mtab" data-filter="disc" role="tab" aria-selected="false">Диски</button>
+      <button class="mtab" data-filter="raglan" role="tab" aria-selected="false">Реглани</button>
+      <button class="mtab" data-filter="beats" role="tab" aria-selected="false">Біти</button>
+      <button class="mtab mtab--ua" data-filter="donate" role="tab" aria-selected="false">Донат на ЗСУ</button>
+    </div>
+
+    <div class="container merch__grid reveal" id="merchGrid">
+      <article class="mcard" data-cat="odiah" tabindex="0">
+        <div class="mcard__media">
+          <span class="mcard__code">TS·01</span>
+          <span class="mcard__tag">Футболка</span>
+          <div class="mcard__photo"><img src="assets/merch-tshirt.jpg" alt="Футболка «Живий»" loading="lazy"></div>
+          <span class="mcard__sticker">NEW ’26</span>
+        </div>
+        <div class="mcard__foot"><h3 class="mcard__name">Футболка «Живий»</h3><span class="mcard__line"></span><p class="mcard__meta">Бавовна 100% · унісекс</p></div>
       </article>
 
-      <article class="item item--photo" tabindex="0">
-        <div class="item__photo"><img src="assets/merch-cap.jpg" alt="Кепка BUMBOX" loading="lazy" onerror="this.closest('.item').classList.add('img-missing')"></div>
-        <p class="item__name">Кепка</p>
+      <article class="mcard" data-cat="odiah" tabindex="0">
+        <div class="mcard__media">
+          <span class="mcard__code">HD·02</span>
+          <span class="mcard__tag">Худі</span>
+          <div class="mcard__photo mcard__photo--graphic"><span class="mcard__print">БУМ<br>БОКС</span><span class="mcard__print-sub">«Живий» · 2026</span></div>
+        </div>
+        <div class="mcard__foot"><h3 class="mcard__name">Худі BUMBOX</h3><span class="mcard__line"></span><p class="mcard__meta">Фліс · oversize</p></div>
       </article>
 
-      <article class="item item--photo" tabindex="0">
-        <div class="item__photo"><img src="assets/merch-shopper.jpg" alt="Шопер BUMBOX" loading="lazy" onerror="this.closest('.item').classList.add('img-missing')"></div>
-        <p class="item__name">Шопер</p>
+      <article class="mcard" data-cat="raglan" tabindex="0">
+        <div class="mcard__media">
+          <span class="mcard__code">RG·03</span>
+          <span class="mcard__tag">Реглан</span>
+          <div class="mcard__photo mcard__photo--graphic mcard__photo--alt"><span class="mcard__print">ЖИ<br>ВИЙ</span><span class="mcard__print-sub">реглан · ¾ рукав</span></div>
+        </div>
+        <div class="mcard__foot"><h3 class="mcard__name">Реглан «Живий»</h3><span class="mcard__line"></span><p class="mcard__meta">Бавовна · ¾ рукав</p></div>
       </article>
 
-      <article class="item item--photo" tabindex="0">
-        <div class="item__photo"><img src="assets/merch-mug.jpg" alt="Чашка BUMBOX" loading="lazy" onerror="this.closest('.item').classList.add('img-missing')"></div>
-        <p class="item__name">Чашка</p>
+      <article class="mcard" data-cat="odiah" tabindex="0">
+        <div class="mcard__media">
+          <span class="mcard__code">CP·04</span>
+          <span class="mcard__tag">Кепка</span>
+          <div class="mcard__photo"><img src="assets/merch-cap.jpg" alt="Кепка BUMBOX" loading="lazy"></div>
+        </div>
+        <div class="mcard__foot"><h3 class="mcard__name">Кепка BUMBOX</h3><span class="mcard__line"></span><p class="mcard__meta">Snapback · вишивка</p></div>
       </article>
 
-      <article class="item item--photo" tabindex="0">
-        <div class="item__photo"><img src="assets/merch-drumsticks.jpg" alt="Барабанні палички" loading="lazy" onerror="this.closest('.item').classList.add('img-missing')"></div>
-        <p class="item__name">Барабанні палички</p>
+      <article class="mcard" data-cat="odiah" tabindex="0">
+        <div class="mcard__media">
+          <span class="mcard__code">SH·05</span>
+          <span class="mcard__tag">Шопер</span>
+          <div class="mcard__photo"><img src="assets/merch-shopper.jpg" alt="Шопер «Живий»" loading="lazy"></div>
+          <span class="mcard__sticker mcard__sticker--y">ECO</span>
+        </div>
+        <div class="mcard__foot"><h3 class="mcard__name">Шопер «Живий»</h3><span class="mcard__line"></span><p class="mcard__meta">Щільна бавовна</p></div>
+      </article>
+
+      <article class="mcard" data-cat="odiah" tabindex="0">
+        <div class="mcard__media">
+          <span class="mcard__code">MG·06</span>
+          <span class="mcard__tag">Чашка</span>
+          <div class="mcard__photo"><img src="assets/merch-mug.jpg" alt="Чашка BUMBOX" loading="lazy"></div>
+        </div>
+        <div class="mcard__foot"><h3 class="mcard__name">Чашка BUMBOX</h3><span class="mcard__line"></span><p class="mcard__meta">Кераміка · 330 мл</p></div>
+      </article>
+
+      <article class="mcard" data-cat="vinyl" tabindex="0">
+        <div class="mcard__media">
+          <span class="mcard__code">LP·07</span>
+          <span class="mcard__tag">Вініл</span>
+          <div class="mcard__photo"><img src="assets/album-rubikon.jpg" alt="Вініл «Рубікон»" loading="lazy"></div>
+          <span class="mcard__sticker mcard__sticker--y">LP</span>
+        </div>
+        <div class="mcard__foot"><h3 class="mcard__name">Вініл «Рубікон»</h3><span class="mcard__line"></span><p class="mcard__meta">12&quot; · 180g</p></div>
+      </article>
+
+      <article class="mcard" data-cat="disc" tabindex="0">
+        <div class="mcard__media">
+          <span class="mcard__code">CD·08</span>
+          <span class="mcard__tag">Диск</span>
+          <div class="mcard__photo"><img src="assets/album-melomania.jpg" alt="Диск «Меломанія»" loading="lazy"></div>
+        </div>
+        <div class="mcard__foot"><h3 class="mcard__name">Диск «Меломанія»</h3><span class="mcard__line"></span><p class="mcard__meta">CD · digipak</p></div>
+      </article>
+
+      <article class="mcard" data-cat="beats" tabindex="0">
+        <div class="mcard__media">
+          <span class="mcard__code">BT·09</span>
+          <span class="mcard__tag">Біти</span>
+          <div class="mcard__photo"><img src="assets/merch-drumsticks.jpg" alt="Барабанні палички" loading="lazy"></div>
+        </div>
+        <div class="mcard__foot"><h3 class="mcard__name">Барабанні палички</h3><span class="mcard__line"></span><p class="mcard__meta">Клен · 5A · пара</p></div>
+      </article>
+
+      <!-- special donation card -->
+      <article class="mcard mcard--donate" data-cat="donate" tabindex="0">
+        <span class="donate__glow" aria-hidden="true"></span>
+        <span class="mcard__code mcard__code--ua">UA · ∞</span>
+        <span class="mcard__tag mcard__tag--ua">Донат на ЗСУ</span>
+        <h3 class="donate__title">Донат на ЗСУ</h3>
+        <p class="donate__text">Підтримай тих, хто тримає небо. Частина коштів з мерчу та окремі донати спрямовуються на підтримку ЗСУ.</p>
+        <a class="btn donate__btn" href="https://u24.gov.ua/" target="_blank" rel="noopener noreferrer" data-cursor="★">Підтримати</a>
       </article>
     </div>
 
