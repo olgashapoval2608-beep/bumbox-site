@@ -674,16 +674,17 @@ b{font-weight:600;color:var(--cream)}
   font-size:.64rem;letter-spacing:.24em;text-transform:uppercase;color:var(--muted)}
 
 .city{position:absolute;transform:translate(-50%,-6px);background:none;border:none;z-index:4;
-  font-family:var(--font-mono);font-size:.72rem;letter-spacing:.1em;color:var(--cream);
-  padding-top:18px;white-space:nowrap;text-shadow:0 1px 5px #000,0 0 2px #000}
+  font-family:var(--font-mono);font-size:.68rem;letter-spacing:.1em;color:transparent;
+  padding-top:18px;white-space:nowrap;transition:color .25s var(--ease)}   /* label hidden until hover → no clutter on a dense map */
+.city:hover,.city:focus-visible{z-index:7;text-shadow:0 1px 6px #000,0 0 3px #000}
 .city::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);
   width:12px;height:12px;border-radius:50%;background:var(--yellow);
   box-shadow:0 0 0 0 rgba(245,197,24,.6);animation:cityPulse 2.6s ease-out infinite}
 @keyframes cityPulse{0%{box-shadow:0 0 0 0 rgba(245,197,24,.55)}100%{box-shadow:0 0 0 16px rgba(245,197,24,0)}}
 .city:hover,.city:focus-visible{color:var(--yellow)}
 .city:hover::before{background:#fff}
-/* home city (Київ) — red accent pin */
-.city--home{color:#ffd2cd}
+/* home city (Львів) — red accent pin */
+.city--home:hover,.city--home:focus-visible{color:#ffd2cd}
 .city--home::before{background:var(--red);animation:cityPulseRed 2.4s ease-out infinite}
 @keyframes cityPulseRed{0%{box-shadow:0 0 0 0 rgba(226,59,46,.6)}100%{box-shadow:0 0 0 18px rgba(226,59,46,0)}}
 
@@ -714,21 +715,58 @@ b{font-weight:600;color:var(--cream)}
 .poster__date{font-family:var(--font-mono);color:var(--yellow);letter-spacing:.2em;margin:.4rem 0}
 .poster__venue{color:var(--muted);letter-spacing:.18em;font-size:.8rem;margin-bottom:1.6rem;text-transform:uppercase}
 
+/* ДРОНОТУР'26 — full tour date list */
+.tourlist{margin-top:8vh}
+.tourlist__head{text-align:center;margin-bottom:3vh}
+.tourlist__head h3{font-family:var(--font-display);font-size:clamp(2rem,5vw,3.4rem);text-transform:uppercase;letter-spacing:.02em}
+.tourlist__rows{list-style:none}
+.tourdate{display:grid;grid-template-columns:96px 1.4fr 1.6fr 1fr auto;align-items:center;gap:1.2rem;
+  padding:1.05rem 1.2rem;border-bottom:1px solid #211e1a;transition:background .3s var(--ease),border-color .3s var(--ease)}
+.tourdate:hover{background:rgba(245,197,24,.06);border-color:rgba(245,197,24,.3)}
+.tourdate__d{font-family:var(--font-mono);color:var(--yellow);font-size:.92rem;letter-spacing:.06em;white-space:nowrap}
+.tourdate__c{font-family:var(--font-display);font-size:1.4rem;line-height:1;text-transform:uppercase}
+.tourdate__v{color:var(--cream)}
+.tourdate__co{color:var(--muted);font-family:var(--font-mono);font-size:.72rem;letter-spacing:.16em;text-transform:uppercase}
+.tourdate--home{background:rgba(226,59,46,.07)}
+.tourdate--home .tourdate__d{color:var(--red)}
+.tourdate .btn--ticket{padding:.55em 1.3em;font-size:.7rem;min-height:0;justify-self:end}
+.tourlist__src{text-align:center;margin-top:2rem;font-size:.82rem}
+.tourlist__src a{color:var(--yellow);border-bottom:1px solid rgba(245,197,24,.4)}
+@media (max-width:720px){
+  .tourdate{grid-template-columns:64px 1fr auto;grid-template-areas:'d c t' 'd v t' 'd co t';gap:.2rem .8rem;padding:.9rem .4rem}
+  .tourdate__d{grid-area:d;align-self:center;font-size:.82rem}
+  .tourdate__c{grid-area:c;font-size:1.15rem}
+  .tourdate__v{grid-area:v;font-size:.86rem}
+  .tourdate__co{grid-area:co}
+  .tourdate .btn--ticket{grid-area:t;align-self:center}
+}
+
 /* =================================================================
    5. MERCH
    ================================================================= */
 .merch{padding:16vh 0 12vh;background:linear-gradient(180deg,#0a0807,#171009 55%,#0d0a08)}
 .merch__head{text-align:center;margin-bottom:7vh}
-.merch__table{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:2.4rem;
-  perspective:1000px;padding:2rem;border-radius:10px;
+.merch__table{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:2rem;
+  perspective:1200px;padding:1rem;border-radius:10px;
   background:radial-gradient(60% 80% at 50% 0,rgba(217,122,52,.14),transparent 70%)}
-.item{position:relative;display:flex;flex-direction:column;align-items:center;gap:1.2rem;
-  padding-bottom:1rem;transition:transform .35s var(--ease);transform-style:preserve-3d}
+.item{position:relative;display:flex;flex-direction:column;align-items:center;gap:1rem;
+  padding-bottom:.4rem;transition:transform .4s var(--ease);transform-style:preserve-3d}
 .item>span,.item__ticket{transition:transform .4s var(--ease),box-shadow .4s var(--ease);
   filter:drop-shadow(0 14px 18px rgba(0,0,0,.6))}
 .item:hover{transform:translateZ(30px)}
 .item:hover>span,.item:focus>span,.item:hover .item__ticket{transform:translateY(-14px) rotateX(8deg)}
-.item__name{font-family:var(--font-mono);font-size:.7rem;letter-spacing:.16em;color:var(--muted);text-transform:uppercase}
+.item__name{font-family:var(--font-mono);font-size:.74rem;letter-spacing:.18em;color:var(--cream);text-transform:uppercase}
+
+/* real product photos — the items are the accent */
+.item--photo{gap:1.1rem}
+.item__photo{position:relative;width:100%;aspect-ratio:4/5;border-radius:10px;overflow:hidden;
+  border:1px solid #2a2724;background:linear-gradient(160deg,#1c1814,#0c0a08);
+  box-shadow:0 22px 48px rgba(0,0,0,.6);transition:box-shadow .45s var(--ease),transform .45s var(--ease)}
+.item__photo img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .6s var(--ease);filter:saturate(1.02)}
+.item--photo:hover .item__photo,.item--photo:focus .item__photo{box-shadow:0 30px 70px rgba(0,0,0,.75),0 0 46px rgba(245,197,24,.22)}
+.item--photo:hover .item__photo img,.item--photo:focus .item__photo img{transform:scale(1.07)}
+.item--photo.img-missing .item__photo{display:grid;place-items:center}
+.item--photo.img-missing .item__photo::after{content:attr(data-fallback);color:var(--muted);font-family:var(--font-mono);font-size:.7rem}
 
 /* vinyl */
 .item--vinyl{position:relative}
@@ -982,7 +1020,7 @@ b{font-weight:600;color:var(--cream)}
 .js-motion .topnav__cta,.js-motion .ctrl--social{will-change:transform}
 
 /* ---- albums: clip-path reveal + 3D tilt + glow ---- */
-.js-motion [data-reveal="album"]{clip-path:inset(0 0 100% 0)}
+.js-motion [data-reveal="album"]{clip-path:inset(0 -60% 100% 0)}  /* right extended so the vinyl is never clipped */
 .js-motion .album__cover{transition:transform .45s var(--ease),box-shadow .45s var(--ease);transform-style:preserve-3d}
 .js-motion .album.tilt .album__cover{box-shadow:0 34px 80px rgba(0,0,0,.6),0 0 46px rgba(245,197,24,.2)}
 
@@ -996,10 +1034,11 @@ b{font-weight:600;color:var(--cream)}
 .poster:hover .btn--solid{box-shadow:0 0 28px rgba(245,197,24,.55)}
 
 /* ---- history documentary HUD: active year + progress line ---- */
-.doc-hud{position:absolute;top:7vh;left:50%;transform:translateX(-50%);z-index:6;display:flex;align-items:baseline;
-  gap:.9rem;font-family:var(--font-mono);pointer-events:none;mix-blend-mode:screen}
-.doc-hud__year{font-family:var(--font-display);font-size:clamp(2rem,5vw,3.4rem);color:var(--yellow);line-height:1;
-  text-shadow:0 0 26px rgba(245,197,24,.45)}
+/* year + index sit at the BOTTOM next to the progress line — never over the card titles */
+.doc-hud{position:absolute;left:50%;bottom:calc(6vh + 14px);transform:translateX(-50%);z-index:6;display:flex;
+  align-items:baseline;gap:.8rem;font-family:var(--font-mono);pointer-events:none;white-space:nowrap}
+.doc-hud__year{font-family:var(--font-display);font-size:clamp(1.5rem,3.2vw,2.4rem);color:var(--yellow);line-height:1;
+  text-shadow:0 0 22px rgba(245,197,24,.4)}
 .doc-hud__count{font-size:.7rem;letter-spacing:.24em;color:var(--muted);text-transform:uppercase}
 .doc-hud__count b{color:var(--cream)}
 .doc-progress{position:absolute;bottom:6vh;left:50%;transform:translateX(-50%);z-index:6;width:min(440px,66vw);height:2px;
@@ -1012,7 +1051,6 @@ b{font-weight:600;color:var(--cream)}
 .js-motion .doc-scene.media-in .scene__media,.js-motion .doc-scene.media-in .scene__video,
 .js-motion .doc-scene.media-in .scene__videos,.js-motion .doc-scene.media-in .scene__stack,
 .js-motion .doc-scene.media-in .bandphoto{clip-path:inset(0 0 0 0%)}
-.js-motion .doc-scene .scene__body{transform:translateX(var(--par,0px))}   /* text/media parallax */
 
 /* ---- gallery (Moments): mask reveal + hover overlay + FLIP lightbox ---- */
 .js-motion .photo{clip-path:inset(0 0 100% 0)}

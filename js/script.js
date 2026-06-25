@@ -465,7 +465,7 @@
   function resetHero() {
     heroCopy.forEach((el) => el.style.removeProperty('opacity'));
     if (scrollCue) scrollCue.style.removeProperty('opacity');
-    if (heroPhoto) { heroPhoto.style.opacity = '0'; heroPhoto.style.transform = ''; }
+    if (heroPhoto) { heroPhoto.style.opacity = '0'; heroPhoto.style.transform = ''; heroPhoto.style.borderRadius = ''; }
     if (heroIntro) heroIntro.style.opacity = '0';
     if (bbTakeover) { boombox.style.opacity = '1'; boombox.style.filter = ''; }
   }
@@ -487,6 +487,8 @@
       const g = Math.min(1, p / 0.8);                      // constant-rate growth → full by 80% (gradual, no jump)
       heroPhoto.style.transform = `scale(${0.1 + 0.9 * g})`;
       heroPhoto.style.opacity = String(Math.min(1, p / 0.12));
+      const shape = Math.max(0, 1 - p / 0.4);              // starts as the cassette-window shape, opens to a full frame
+      heroPhoto.style.borderRadius = (shape * 50).toFixed(1) + '%';
     }
     // TRACK 01 intro text appears once the photo fills the screen
     if (heroIntro) heroIntro.style.opacity = String(Math.max(0, (p - 0.7) / 0.25));

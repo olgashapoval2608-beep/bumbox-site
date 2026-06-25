@@ -239,7 +239,7 @@
     ScrollTrigger.create({
       trigger: '#albums', start: 'top 72%', once: true,
       onEnter: () => gsap.fromTo('[data-reveal="album"]',
-        { clipPath: 'inset(0 0 100% 0)' }, { clipPath: 'inset(0 0 0% 0)', duration: 1.0, stagger: 0.08, ease: 'power3.out' }),
+        { clipPath: 'inset(0 -60% 100% 0)' }, { clipPath: 'inset(0 -60% 0% 0)', duration: 1.0, stagger: 0.08, ease: 'power3.out' }),
     });
     if (fine) {
       albums.forEach((a) => {
@@ -269,16 +269,15 @@
       tours.insertBefore(par, tours.firstChild);
       gsap.fromTo(par, { yPercent: -8 }, { yPercent: 12, ease: 'none', scrollTrigger: { trigger: tours, start: 'top bottom', end: 'bottom top', scrub: true } });
     }
-    const posters = $$('.poster');
-    posters.forEach((p) => p.setAttribute('data-reveal', 'poster'));
-    if (posters.length) {
-      ScrollTrigger.create({
-        trigger: '.posters', start: 'top 82%', once: true,
-        onEnter: () => gsap.fromTo('[data-reveal="poster"]',
-          { clipPath: 'inset(0 0 100% 0)', y: 28 }, { clipPath: 'inset(0 0 0% 0)', y: 0, duration: 0.9, stagger: 0.14, ease: 'power3.out' }),
+    const rows = $$('.tourdate');
+    if (rows.length) {
+      // visible by default; animates in on scroll. immediateRender:false → never stuck hidden
+      gsap.from(rows, {
+        y: 22, opacity: 0, duration: 0.6, stagger: 0.05, ease: 'power3.out', immediateRender: false,
+        scrollTrigger: { trigger: '.tourlist', start: 'top 85%', once: true },
       });
     }
-    $$('.poster .btn--solid, .topnav__cta').forEach((b) => magnetic(b, 0.3));
+    $$('.tourdate .btn--ticket, .topnav__cta').forEach((b) => magnetic(b, 0.25));
   }
 
   /* ================================================================
@@ -292,7 +291,6 @@
     const bar = $('#docProgressBar'), yearEl = $('#docYear'), idxEl = $('#docIndex');
     const labels = scenes.map((s) => { const c = s.querySelector('.scene__chip'); return c ? c.textContent.replace('▶', '').trim() : ''; });
 
-    const bodies = scenes.map((s) => s.querySelector('.scene__body'));
     function update() {
       if (window.innerWidth <= 720) return;
       const total = stage.offsetHeight - window.innerHeight;
@@ -302,9 +300,6 @@
       if (ci < 0) ci = Math.round(p * (scenes.length - 1));
       if (yearEl && labels[ci]) yearEl.textContent = labels[ci];
       if (idxEl) idxEl.textContent = String(ci + 1).padStart(2, '0');
-      // subtle text/media parallax only near the centre (cheap: one rect read)
-      const c = scenes[ci]; const body = bodies[ci];
-      if (c && body) { const r = c.getBoundingClientRect(); body.style.setProperty('--par', ((r.left + r.width / 2 - window.innerWidth / 2) * 0.04).toFixed(1) + 'px'); }
     }
     ScrollTrigger.create({ trigger: stage, start: 'top top', end: 'bottom bottom', onUpdate: update, onRefresh: update });
     update();
