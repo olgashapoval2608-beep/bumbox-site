@@ -19,6 +19,15 @@
   <!-- Skip to content (keyboard / screen-reader) -->
   <a href="#hero" class="skip-link">Перейти до вмісту</a>
 
+  <!-- Cinematic page loader (dark → logo → scale → hero blur-to-clear) -->
+  <div class="loader" id="loader" aria-hidden="true">
+    <span class="loader__logo">БУМБОКС</span>
+    <span class="loader__bar"><i></i></span>
+  </div>
+
+  <!-- cursor-follow light (desktop only) -->
+  <div class="cursor-light" id="cursorLight" aria-hidden="true"></div>
+
   <!-- Cinematic intro: black → noise → reveal -->
   <div class="intro" aria-hidden="true"></div>
 
@@ -51,6 +60,7 @@
   <nav class="topnav" id="topnav" aria-label="Головна навігація">
     <a href="#hero" class="topnav__logo" data-cursor="▶">БУМБОКС</a>
     <ul class="topnav__list" id="navList">
+      <span class="topnav__indicator" id="navIndicator" aria-hidden="true"></span>
       <li><a href="#hero"    class="topnav__item is-active"><b>00</b><span>Hero</span></a></li>
       <li><a href="#history" class="topnav__item"><b>01</b><span>Історія</span></a></li>
       <li><a href="#albums"  class="topnav__item"><b>02</b><span>Альбоми</span></a></li>
@@ -178,6 +188,11 @@
     <!-- documentary scenes — horizontal timeline driven by vertical scroll -->
     <div class="doc-stage" id="docStage">
       <div class="doc-pin">
+        <div class="doc-hud" aria-hidden="true">
+          <span class="doc-hud__year" id="docYear">2004</span>
+          <span class="doc-hud__count"><b id="docIndex">01</b> / 06</span>
+        </div>
+        <div class="doc-progress" id="docProgress" aria-hidden="true"><i id="docProgressBar"></i></div>
         <div class="doc-track" id="docTrack" role="region" aria-label="Таймлайн історії">
 
       <!-- 2004 -->
@@ -620,6 +635,11 @@
     <p class="footer__years">2004 — ∞</p>
   </footer>
 
-  <script src="js/script.js"></script>
+  <!-- motion libraries (vendored locally — no CDN dependency at runtime) -->
+  <script src="js/vendor/gsap.min.js" defer></script>
+  <script src="js/vendor/ScrollTrigger.min.js" defer></script>
+  <script src="js/vendor/lenis.min.js" defer></script>
+  <script src="js/script.js" defer></script>
+  <script src="js/motion.js" defer></script>
 </body>
 </html>

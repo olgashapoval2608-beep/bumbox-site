@@ -1,0 +1,15 @@
+{
+  "name": "bumbox-site",
+  "version": "1.0.0",
+  "description": "Інтерактивний односторінковий сайт-історія для гурту Бумбокс — магнітофон → касета → музика → час.",
+  "scripts": {
+    "build": "node scripts/build-check.js",
+    "dev": "python3 -m http.server 8000"
+  },
+  "keywords": [],
+  "license": "ISC",
+  "dependencies": {
+    "gsap": "^3.12.5",
+    "lenis": "^1.1.14"
+  }
+}

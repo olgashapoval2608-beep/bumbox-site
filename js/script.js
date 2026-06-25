@@ -113,13 +113,15 @@
     warp.style.top = (sp.top + sp.height / 2) + 'px';
     warp.classList.remove('go'); void warp.offsetWidth; warp.classList.add('go');
     // jump instantly while the warp covers the screen (hero is now a tall sticky zone)
-    setTimeout(() => { const h = $('#history'); if (h) h.scrollIntoView({ behavior: 'auto' }); }, 600);
+    setTimeout(() => { const h = $('#history'); if (!h) return; if (window.__lenis) window.__lenis.scrollTo(h, { immediate: true }); else h.scrollIntoView({ behavior: 'auto' }); }, 600);
     setTimeout(() => warp.classList.remove('go'), 1300);
   }
 
   function goTo(sel) {
     const t = $(sel);
-    if (t) t.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' });
+    if (!t) return;
+    if (window.__lenis && !reduceMotion) { window.__lenis.scrollTo(t, { offset: -4 }); return; }
+    t.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' });
   }
 
   /* =================================================================
@@ -421,7 +423,7 @@
     again.addEventListener('click', () => {
       if (reduceMotion) { scrollTo({ top: 0 }); return; }
       rewind.classList.add('go');
-      setTimeout(() => scrollTo({ top: 0, behavior: 'auto' }), 700);
+      setTimeout(() => { if (window.__lenis) window.__lenis.scrollTo(0, { immediate: true }); else scrollTo({ top: 0, behavior: 'auto' }); }, 700);
       setTimeout(() => {
         rewind.classList.remove('go');
         // reset hero
@@ -465,7 +467,7 @@
     if (scrollCue) scrollCue.style.removeProperty('opacity');
     if (heroPhoto) { heroPhoto.style.opacity = '0'; heroPhoto.style.transform = ''; }
     if (heroIntro) heroIntro.style.opacity = '0';
-    if (bbTakeover) boombox.style.opacity = '1';
+    if (bbTakeover) { boombox.style.opacity = '1'; boombox.style.filter = ''; }
   }
 
   function updateHeroZoom() {
@@ -480,6 +482,7 @@
     const k = Math.min(1, p * 2.5);                        // flatten the tilt early
     boombox.style.transform = `perspective(${1400 + p * 4000}px) rotateX(${6 * (1 - k)}deg) rotateY(${-7 * (1 - k)}deg) scale(${1 + p * 1.4})`;
     boombox.style.opacity = String(Math.max(0, 1 - p / 0.5));
+    boombox.style.filter = `blur(${(p * 6).toFixed(2)}px) drop-shadow(0 40px 60px rgba(0,0,0,.7))`;   // soft defocus as it dissolves
     // ONE photo grows continuously from cassette size → full screen (eased, no jump)
     if (heroPhoto) {
       const g = Math.min(1, p / 0.8);                      // constant-rate growth → full by 80% (gradual, no jump)
