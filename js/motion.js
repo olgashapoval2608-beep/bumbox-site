@@ -372,8 +372,8 @@
     }
     function open(ph) {
       const imgEl = $('.photo__img', ph);
-      const bg = imgEl && imgEl.style.backgroundImage; if (!bg) return;   // video tiles have no bg → no lightbox
-      const url = bg.slice(bg.indexOf('(') + 1, bg.lastIndexOf(')')).replace(/^["']|["']$/g, '');
+      if (!imgEl || imgEl.tagName !== 'IMG') return;   // video tiles use a <div>, not <img> → no lightbox
+      const url = imgEl.getAttribute('src');
       from = ph;
       const r = (imgEl || ph).getBoundingClientRect();
       cap.textContent = ph.dataset.tag || '';

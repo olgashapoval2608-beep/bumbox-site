@@ -348,39 +348,39 @@
      ================================================================= */
   const scatter = $('#scatter');
   // Moments wall — every shot from the "фоточки" folder, captioned by its name; a few videos too.
+  // each `ar` is the photo's REAL width/height → polaroid window matches the photo, nothing is cropped
   const momentItems = [
-    { f: 'foto-bus', t: 'Автобус' },
-    { f: 'foto-atmosfera', t: 'Атмосфера' },
-    { f: 'foto-pochatok', t: 'Початок' },
-    { f: 'foto-bb', t: 'ББ' },
-    { f: 'foto-basgirl', t: 'Бас-гьорл' },
-    { f: 'video-stari-vystupy', t: 'Старі виступи', v: true },
-    { f: 'foto-vibe', t: 'Вайб' },
-    { f: 'foto-bigshow', t: 'Великий концерт' },
-    { f: 'foto-allofus', t: 'Всі ми' },
-    { f: 'foto-guitarist', t: 'Гітарист' },
-    { f: 'foto-fire', t: 'Вогонь' },
-    { f: 'video-divka', t: 'Дівка', v: true },
-    { f: 'foto-club', t: 'Клуб' },
-    { f: 'foto-concerts', t: 'Концерти' },
-    { f: 'foto-krasa', t: 'Краса' },
-    { f: 'foto-lyulya', t: 'Люля' },
-    { f: 'foto-mukha', t: 'Муха' },
-    { f: 'city-team', t: 'Команда', v: true },
-    { f: 'foto-dorozhka', t: 'На дорожку' },
-    { f: 'foto-pupupu', t: 'Пу-пу-пу' },
-    { f: 'foto-roztyazhka', t: 'Розтяжка' },
-    { f: 'foto-spory', t: 'Спори' },
-    { f: 'foto-fan', t: 'Фан-фото' },
-    { f: 'city-kontsert', t: 'Концерт', v: true },
-    { f: 'foto-chb', t: 'ЧБ' },
-    { f: 'foto-chill', t: 'Чілл' },
-    { f: 'foto-festival', t: 'Фестиваль' },
-    { f: 'foto-2004', t: '2004' },
+    { f: 'foto-bus', t: 'Автобус', ar: 1.02 },
+    { f: 'foto-atmosfera', t: 'Атмосфера', ar: 1.261 },
+    { f: 'foto-pochatok', t: 'Початок', ar: 1.613 },
+    { f: 'foto-bb', t: 'ББ', ar: 1.223 },
+    { f: 'foto-basgirl', t: 'Бас-гьорл', ar: 0.75 },
+    { f: 'video-stari-vystupy', t: 'Старі виступи', v: true, ar: 0.547 },
+    { f: 'foto-vibe', t: 'Вайб', ar: 1.796 },
+    { f: 'foto-bigshow', t: 'Великий концерт', ar: 2.0 },
+    { f: 'foto-allofus', t: 'Всі ми', ar: 1.778 },
+    { f: 'foto-guitarist', t: 'Гітарист', ar: 1.414 },
+    { f: 'foto-fire', t: 'Вогонь', ar: 0.843 },
+    { f: 'foto-dorozhka2', t: 'Присіли на дорожку 2', ar: 0.791 },
+    { f: 'foto-club', t: 'Клуб', ar: 1.333 },
+    { f: 'foto-concerts', t: 'Концерти', ar: 2.226 },
+    { f: 'foto-krasa', t: 'Краса', ar: 1.499 },
+    { f: 'foto-lyulya', t: 'Люля', ar: 0.669 },
+    { f: 'foto-mukha', t: 'Муха', ar: 1.333 },
+    { f: 'city-team', t: 'Команда', v: true, ar: 0.547 },
+    { f: 'foto-dorozhka', t: 'На дорожку', ar: 0.817 },
+    { f: 'foto-pupupu', t: 'Пу-пу-пу', ar: 0.779 },
+    { f: 'foto-roztyazhka', t: 'Розтяжка', ar: 1.501 },
+    { f: 'foto-spory', t: 'Спори', ar: 0.985 },
+    { f: 'foto-fan', t: 'Фан-фото', ar: 1.791 },
+    { f: 'city-kontsert', t: 'Концерт', v: true, ar: 0.547 },
+    { f: 'foto-chb', t: 'ЧБ', ar: 1.573 },
+    { f: 'foto-chill', t: 'Чілл', ar: 0.816 },
+    { f: 'foto-festival', t: 'Фестиваль', ar: 1.505 },
+    { f: 'foto-2004', t: '2004', ar: 1.1 },
   ];
   // deterministic decoration data → the composition reads as intentional and stays stable on reload
   const ROTS = [-3.4, 2.6, -1.8, 3.2, -2.5, 1.6, -3.1, 2.2, -1.3, 2.9];
-  const ARS = ['4 / 5', '1 / 1', '4 / 5', '5 / 6', '3 / 4', '4 / 5', '5 / 4', '1 / 1', '3 / 4', '4 / 5'];
   const STAMPS = ['12·08·04', '03·11·07', '27·06·09', '14·09·12', '08·05·15', '19·02·18', '30·07·21', '05·12·22'];
   const LABELS = ['АРХІВ', 'ПЛІВКА', 'LIVE', 'ТУР', 'BACKSTAGE', '35 ММ'];
   const deco = (cls, txt) => { const s = document.createElement('span'); s.className = cls; if (txt) s.textContent = txt; return s; };
@@ -396,17 +396,24 @@
     const card = document.createElement('div');
     card.className = 'photo__card';
 
-    const img = document.createElement('div');
-    img.className = it.v ? 'photo__img photo__img--video' : 'photo__img';
-    img.style.setProperty('--ar', ARS[i % ARS.length]);
+    let img;
     if (it.v) {
+      img = document.createElement('div');
+      img.className = 'photo__img photo__img--video';
+      img.style.setProperty('--ar', it.ar);
       const vid = document.createElement('video');
       vid.src = `assets/${it.f}.mp4`;
       vid.muted = true; vid.loop = true; vid.autoplay = true; vid.playsInline = true;
       vid.setAttribute('playsinline', ''); vid.preload = 'metadata';
       img.appendChild(vid);
     } else {
-      img.style.backgroundImage = `url(assets/${it.f}.jpg)`;   // photo untouched — only framed
+      img = document.createElement('img');                     // real <img> → whole photo, never cropped
+      img.className = 'photo__img';
+      img.src = `assets/${it.f}.jpg`;
+      img.alt = it.t;
+      img.decoding = 'async';
+      img.width = Math.round(it.ar * 1000);                    // ratio → reserves layout space (no reflow)
+      img.height = 1000;
     }
     card.appendChild(img);
     card.appendChild(deco('photo__cap', it.t));               // handwritten caption on the frame

@@ -257,6 +257,22 @@ b{font-weight:600;color:var(--cream)}
   color:var(--yellow);opacity:0;transition:opacity .3s var(--ease);pointer-events:none;
   text-shadow:0 0 14px rgba(245,197,24,.55)}
 
+/* hero side rail (бокова панель) — socials + vertical brand, pinned on the main screen */
+.hero-rail{position:absolute;left:clamp(14px,3vw,46px);top:50%;z-index:7;
+  display:flex;flex-direction:column;align-items:center;gap:1.3rem;
+  transform:translate(0,-50%);opacity:0;animation:railIn 1s var(--ease) .8s forwards}
+@keyframes railIn{from{opacity:0;transform:translate(-18px,-50%)}to{opacity:1;transform:translate(0,-50%)}}
+.hero-rail__social{display:flex;flex-direction:column;gap:.55rem}
+.hero-rail__link{width:36px;height:36px;display:grid;place-items:center;border:1px solid #34302a;border-radius:8px;
+  background:rgba(8,7,6,.5);color:var(--cream);font-family:var(--font-mono);font-size:.62rem;letter-spacing:.04em;
+  text-decoration:none;-webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px);transition:.3s var(--ease)}
+.hero-rail__link:hover,.hero-rail__link:focus-visible{border-color:var(--yellow);color:var(--yellow);
+  transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.45),0 0 18px rgba(245,197,24,.22);outline:none}
+.hero-rail__line{width:1px;height:clamp(40px,9vh,84px);background:linear-gradient(180deg,var(--yellow),transparent)}
+.hero-rail__brand{writing-mode:vertical-rl;transform:rotate(180deg);font-family:var(--font-mono);font-size:.66rem;
+  letter-spacing:.34em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+@media (max-width:860px){.hero-rail{display:none}}
+
 /* =================================================================
    THE BOOMBOX
    ================================================================= */
@@ -966,7 +982,8 @@ b{font-weight:600;color:var(--cream)}
     linear-gradient(150deg,#f6efdd,#e7dcc4);
   box-shadow:0 1px 1px rgba(0,0,0,.4),0 9px 18px rgba(0,0,0,.42),0 24px 44px rgba(0,0,0,.5);
   transition:transform .5s cubic-bezier(.34,1.34,.5,1),box-shadow .45s var(--ease)}
-.photo__img{position:relative;z-index:1;aspect-ratio:var(--ar,4/5);background:#16130f 50%/cover no-repeat}
+.photo__img{position:relative;z-index:1;display:block}
+img.photo__img{width:100%;height:auto;background:#16130f}   /* real <img> → whole photo, never cropped */
 .photo__cap{position:absolute;left:7%;right:7%;bottom:5%;z-index:3;text-align:center;white-space:nowrap;
   overflow:hidden;text-overflow:ellipsis;color:#2c2820;
   font-family:'Caveat','Segoe Script',cursive;font-size:clamp(.92rem,1.5vw,1.2rem);line-height:1}
@@ -977,7 +994,7 @@ b{font-weight:600;color:var(--cream)}
 .photo__card:focus-visible{outline:2px solid var(--yellow);outline-offset:4px}
 
 /* video tiles */
-.photo__img--video{overflow:hidden}
+.photo__img--video{aspect-ratio:var(--ar,.56);overflow:hidden;background:#0c0b0a}
 .photo__img--video video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#0c0b0a}
 .photo__img--video::after{content:'▶';position:absolute;left:8px;bottom:8px;z-index:2;width:1.6em;height:1.6em;
   display:grid;place-items:center;border-radius:50%;background:var(--yellow);color:#1a1510;font-size:.6rem;
