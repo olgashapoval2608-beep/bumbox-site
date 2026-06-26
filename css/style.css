@@ -213,17 +213,48 @@ b{font-weight:600;color:var(--cream)}
 .display.glow .display__text{color:#fff;text-shadow:0 0 12px rgba(245,197,24,.85)}
 .tr{position:fixed;inset:0;z-index:130;pointer-events:none}
 .tr__vignette{position:absolute;inset:0;opacity:0;
-  background:radial-gradient(125% 95% at 50% 46%,transparent 0,transparent 33%,rgba(4,4,4,.55) 78%,rgba(2,2,2,.92) 100%)}
+  background:radial-gradient(125% 95% at 50% 46%,transparent 0,transparent 30%,rgba(4,4,4,.62) 76%,rgba(2,2,2,.95) 100%)}
 .tr__spot{position:absolute;inset:0;opacity:0;mix-blend-mode:screen;pointer-events:none;
-  background:radial-gradient(40% 32% at 50% 47%,rgba(245,197,24,.24),rgba(245,197,24,.06) 46%,transparent 72%)}
-.tr__win{position:fixed;left:0;top:0;box-sizing:border-box;border:12px solid #f4efe2;border-bottom-width:42px;border-radius:3px;
-  background:#f4efe2;transform-origin:50% 50%;will-change:transform;backface-visibility:hidden;
-  box-shadow:0 34px 64px rgba(0,0,0,.6),0 10px 22px rgba(0,0,0,.5)}
-.tr__win>div{position:absolute;inset:0}
+  background:radial-gradient(42% 34% at 50% 48%,rgba(245,197,24,.22),rgba(245,197,24,.05) 46%,transparent 72%)}
+
+/* ---- cassette deck close-up: where the mechanics play out ---- */
+.tr__deck{position:fixed;left:50%;top:50%;width:min(540px,74vw);aspect-ratio:1.46/1;opacity:0;
+  transform:translate(-50%,-50%) scale(.42);transform-origin:50% 50%;will-change:transform,opacity;perspective:1200px;
+  border-radius:16px;background:linear-gradient(180deg,#2c2926,#1c1915 58%,#120f09);
+  border:1px solid #3a342c;box-shadow:0 50px 92px rgba(0,0,0,.72),inset 0 2px 4px rgba(255,255,255,.07),inset 0 -8px 18px rgba(0,0,0,.6)}
+.tr__well{position:absolute;left:7%;right:7%;top:12%;bottom:9%;border-radius:9px;
+  background:radial-gradient(130% 130% at 50% 22%,#15120e,#070503);box-shadow:inset 0 10px 26px rgba(0,0,0,.9)}
+/* the cassette unit — slides UP out of the deck (the main movement) */
+.tr__cassette{position:absolute;left:11%;right:11%;bottom:9%;height:72%;will-change:transform}
+.tr__casbody{position:absolute;inset:0;z-index:2;border-radius:6px;
+  background:linear-gradient(180deg,#2b2721,#15120c);border:1px solid #443c32;
+  box-shadow:inset 0 1px 2px rgba(255,255,255,.08),0 12px 22px rgba(0,0,0,.55)}
+.tr__casbody::before{content:'';position:absolute;left:8%;right:8%;top:12%;height:46%;border-radius:6px;
+  background:radial-gradient(circle at 50% 45%,#262420,#0a0907);border:1px solid #000}
+.tr__reel{position:absolute;top:25%;width:15%;aspect-ratio:1;border-radius:50%;z-index:3;
+  background:radial-gradient(circle,#46413a 0 30%,#16140f 31%);border:2px solid #5a544a;box-shadow:0 0 0 3px rgba(0,0,0,.4)}
+.tr__reel--l{left:25%}.tr__reel--r{right:25%}
+.tr__reel::after{content:'';position:absolute;inset:0;border-radius:50%;
+  background-image:repeating-conic-gradient(#6a6359 0 8deg,transparent 8deg 30deg);
+  -webkit-mask:radial-gradient(circle,#000 34%,#0000 35%);mask:radial-gradient(circle,#000 34%,#0000 35%)}
+.tr__label{position:absolute;left:11%;right:11%;bottom:10%;height:22%;z-index:3;border-radius:2px;
+  background:linear-gradient(180deg,#efe7d6,#d6cbb4);display:grid;place-items:center;
+  font-family:var(--font-mono);font-size:.46rem;letter-spacing:.1em;color:#3a342a}
+/* the instant photo, stored INSIDE the cassette (z below the body) — slides out the top */
+.tr__photo{position:absolute;left:15%;right:15%;bottom:6%;z-index:1;aspect-ratio:1/.84;box-sizing:border-box;
+  border:6px solid #f4efe2;border-bottom-width:20px;border-radius:2px;background:#f4efe2;will-change:transform;
+  box-shadow:0 14px 26px rgba(0,0,0,.6)}
+.tr__photo>div{position:absolute;inset:0}
 .tr__img{background:url("../assets/history-banner.jpg") center/cover;will-change:filter}
 .tr__develop{background:linear-gradient(155deg,#2b251c,#0c0a07)}
-.tr__grain{opacity:.45;mix-blend-mode:overlay;background-size:150px 150px;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E")}
+.tr__grain{opacity:.4;mix-blend-mode:overlay;background-size:140px 140px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E")}
+/* deck door — smoked flap hinged at the bottom, swings open toward the viewer */
+.tr__door{position:absolute;left:6%;right:6%;top:9%;bottom:7%;z-index:5;transform-origin:50% 100%;will-change:transform;
+  border-radius:8px;background:linear-gradient(180deg,rgba(56,52,46,.96),rgba(24,20,16,.97));
+  border:1px solid #4a423a;box-shadow:inset 0 2px 6px rgba(255,255,255,.06),0 8px 16px rgba(0,0,0,.5)}
+.tr__door::after{content:'';position:absolute;left:11%;right:11%;top:15%;height:52%;border-radius:5px;
+  background:linear-gradient(180deg,rgba(120,150,170,.14),rgba(18,26,34,.22));border:1px solid rgba(255,255,255,.07)}
 /* while PLAY is animating, clear the resting hero copy (matches the scroll-zoom fade) */
 .hero.tr-playing .hero__eyebrow,.hero.tr-playing .hero__title,.hero.tr-playing .hero__lead,
 .hero.tr-playing .hero__cta,.hero.tr-playing .scroll-cue,.hero.tr-playing .deco-label{

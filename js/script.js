@@ -144,71 +144,91 @@
     lockScroll(true);
     cassetteSound('mech');
 
-    // overlay holding the developing photo (built lazily, removed at the end)
+    // ---- cassette-deck overlay (built lazily, removed at the end) ----
     const layer = document.createElement('div');
     layer.className = 'tr'; layer.id = 'playTr'; layer.setAttribute('aria-hidden', 'true');
-    layer.innerHTML = '<div class="tr__vignette"></div><div class="tr__spot"></div><div class="tr__win"><div class="tr__img"></div><div class="tr__develop"></div><div class="tr__grain"></div></div>';
+    layer.innerHTML =
+      '<div class="tr__vignette"></div><div class="tr__spot"></div>' +
+      '<div class="tr__deck">' +
+        '<div class="tr__well"></div>' +
+        '<div class="tr__cassette">' +
+          '<div class="tr__photo"><div class="tr__img"></div><div class="tr__develop"></div><div class="tr__grain"></div></div>' +
+          '<div class="tr__casbody"></div>' +
+          '<span class="tr__reel tr__reel--l"></span><span class="tr__reel tr__reel--r"></span>' +
+          '<div class="tr__label">TRACK 01 — BUMBOX 20</div>' +
+        '</div>' +
+        '<div class="tr__door"></div>' +
+      '</div>';
     document.body.appendChild(layer);
-    const vignette = layer.querySelector('.tr__vignette');
-    const spot = layer.querySelector('.tr__spot');
-    const win = layer.querySelector('.tr__win');
-    const img = layer.querySelector('.tr__img');
-    const develop = layer.querySelector('.tr__develop');
+    const q = (s) => layer.querySelector(s);
+    const vignette = q('.tr__vignette'), spot = q('.tr__spot'), deck = q('.tr__deck'),
+      cassette = q('.tr__cassette'), photo = q('.tr__photo'), develop = q('.tr__develop'),
+      img = q('.tr__img'), door = q('.tr__door');
 
-    // preview geometry (centred), from the banner's 700×434 ratio
-    const AR = 700 / 434;
-    const W = Math.min(440, innerWidth * 0.34, innerHeight * 0.5 * AR), H = W / AR;
-    const PL = (innerWidth - W) / 2, PT = (innerHeight - H) / 2;
-    Object.assign(win.style, { left: PL + 'px', top: PT + 'px', width: W + 'px', height: H + 'px' });
-    const cx = PL + W / 2, cy = PT + H / 2;
+    // the deck grows out of the real cassette's screen position, then settles centred (push-in)
+    const cr = cassetteWinEl.getBoundingClientRect();
+    const deckW = Math.min(540, innerWidth * 0.74);
+    const startScale = Math.max(0.16, (cr.width * 1.5) / deckW);
+    const startX = (cr.left + cr.width / 2) - innerWidth / 2;
+    const startY = (cr.top + cr.height / 2) - innerHeight / 2;
 
-    // transform that places the photo small, inside the cassette window (read live)
-    const fromCassette = () => {
-      const r = cassetteWinEl.getBoundingClientRect();
-      return { x: (r.left + r.width / 2) - cx, y: (r.top + r.height / 2) - cy + 24, scale: Math.max(0.06, r.width / W) };
-    };
-    // transform that scales the photo to cover the whole viewport
-    const toFull = () => {
-      const S = Math.max(innerWidth / W, innerHeight / H) * 1.02;
-      return { x: innerWidth / 2 - cx, y: innerHeight / 2 - cy, scale: S };
-    };
+    const tl = g.timeline({ defaults: { ease: 'power2.inOut' } });
 
-    const tl = g.timeline({ defaults: { ease: 'power2.inOut' }, onComplete: () => finishTransition(layer, cassetteEl) });
-
-    // STAGE 1 — the deck comes alive: turns to face the viewer, glows, dims the room
+    // STAGE 1 — power on: the deck faces the viewer, display glows, the room dims
     display.textContent = 'PLAY'; displaySub.textContent = 'rec';
     boombox.style.animation = 'none';
     g.set(boombox, { transformPerspective: 1400, rotationX: 6, rotationY: -7, scale: 1 });
-    tl.to(boombox, { duration: 0.6, ease: 'power3.out', rotationX: 0, rotationY: 0, scale: 1.2 }, 0);
+    g.set(deck, { xPercent: -50, yPercent: -50, x: startX, y: startY, scale: startScale, opacity: 0 });
+    tl.to(boombox, { duration: 0.55, ease: 'power3.out', rotationX: 0, rotationY: 0, scale: 1.18 }, 0);
     tl.to(vignette, { duration: 0.6, opacity: 1 }, 0);
-    tl.to(spot, { duration: 0.65, opacity: 1, ease: 'power2.out' }, 0);            // warm "comes alive" glow
-    tl.add(() => { display.textContent = 'TRACK 01'; displaySub.textContent = 'історія'; }, 0.42);
+    tl.to(spot, { duration: 0.6, opacity: 1 }, 0);
+    tl.add(() => { display.textContent = 'TRACK 01'; displaySub.textContent = 'історія'; }, 0.4);
 
-    // STAGE 2 — compartment ejects (subtle, mechanical) + a click
-    tl.to(cassetteEl, { duration: 0.5, yPercent: -13, ease: 'power2.out' }, 0.6);
-    tl.add(() => cassetteSound('click'), 0.64);
+    // STAGE 1.5 — push into the deck (grows from the real cassette → centred close-up); fade the boombox
+    tl.to(deck, { duration: 0.7, opacity: 1, x: 0, y: 0, scale: 1, ease: 'power3.inOut' }, 0.45);
+    tl.to(boombox, { duration: 0.45, opacity: 0, ease: 'power2.in' }, 0.6);
 
-    // STAGE 3 — ONE instant photo: white border first, slides up, develops, analog flicker
-    tl.add(() => g.set(win, Object.assign({ opacity: 0 }, fromCassette())), 0.64);
-    tl.to(win, { duration: 0.22, opacity: 1 }, 0.7);                                   // border appears
-    tl.to(win, { duration: 0.72, x: 0, y: 0, scale: 1, ease: 'power2.out' }, 0.78);    // slides up + grows
-    tl.to(develop, { duration: 0.72, opacity: 0, ease: 'power1.inOut' }, 0.9);         // image develops
-    tl.fromTo(img, { filter: 'brightness(.2) contrast(1.35) saturate(.55) blur(4px)' },
-                   { duration: 0.72, filter: 'brightness(1) contrast(1) saturate(1) blur(0px)', ease: 'power1.inOut' }, 0.9);
-    tl.to(win, { duration: 0.05, opacity: 0.8, repeat: 5, yoyo: true }, 0.98);         // analog flicker
-    tl.set(win, { opacity: 1 }, 1.5);
+    // STAGE 2 — the deck door opens (hinged at the bottom, swings down toward the viewer) + click
+    tl.to(door, { duration: 0.6, rotateX: 90, ease: 'power3.inOut' }, 1.1);
+    tl.add(() => cassetteSound('click'), 1.16);
+    tl.to(door, { duration: 0.3, opacity: 0, ease: 'power1.in' }, 1.6);
 
-    // ~0.5s pause, then STAGE 4 — zoom up; the white border disappears → becomes History
-    tl.to(win, Object.assign({ duration: 0.95, ease: 'power3.inOut' }, toFull()), 2.05);
-    tl.to(win, { duration: 0.5, borderTopWidth: 0, borderRightWidth: 0, borderBottomWidth: 0, borderLeftWidth: 0, borderRadius: 0, ease: 'power2.in' }, 2.1);
-    tl.to(win, { duration: 0.4, boxShadow: '0 0 0 0 rgba(0,0,0,0)' }, 2.1);
+    // STAGE 3 — the cassette SLIDES OUT (rises ~40% above the deck): the main, slow mechanical movement
+    tl.to(cassette, { duration: 1.0, y: '-64%', ease: 'power2.out' }, 1.55);
+    tl.add(() => cassetteSound('click'), 2.45);
+
+    // STAGE 4 — ONE instant photo emerges FROM INSIDE the cassette (only after it is fully out), develops
+    tl.to(photo, { duration: 1.05, y: '-122%', ease: 'power2.out' }, 2.8);
+    tl.to(develop, { duration: 1.0, opacity: 0, ease: 'power1.inOut' }, 3.1);
+    tl.fromTo(img, { filter: 'brightness(.22) contrast(1.3) saturate(.6) blur(3px)' },
+                   { duration: 1.0, filter: 'brightness(1) contrast(1) saturate(1) blur(0px)', ease: 'power1.inOut' }, 3.1);
+    tl.to(photo, { duration: 0.05, opacity: 0.82, repeat: 4, yoyo: true }, 3.2);      // analog flicker
+    tl.set(photo, { opacity: 1 }, 3.7);
+
+    // STAGE 5 — ~0.5s pause, then the photo scales up toward the viewer and BECOMES History
+    tl.add(() => flyPhotoToHistory(layer, photo), 4.25);
   }
 
-  // STAGE 5 — hand off to the real History screen, then drop the overlay (same image → no cut)
-  function finishTransition(layer, cassetteEl) {
+  // detach the emerged photo and FLIP it to fullscreen; the white border melts → History background
+  function flyPhotoToHistory(layer, photo) {
+    const g = window.gsap;
+    const r = photo.getBoundingClientRect();                 // freeze its current on-screen box
+    layer.appendChild(photo);                                // out of the deck's transformed space → viewport-fixed
+    g.set(photo, { clearProps: 'transform' });
+    Object.assign(photo.style, { position: 'fixed', left: r.left + 'px', top: r.top + 'px', width: r.width + 'px', height: r.height + 'px', right: 'auto', bottom: 'auto', margin: '0' });
+    const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+    const S = Math.max(innerWidth / r.width, innerHeight / r.height) * 1.04;
+    g.timeline({ defaults: { ease: 'power3.inOut' }, onComplete: () => finishTransition(layer) })
+      .to(photo, { duration: 1.0, x: innerWidth / 2 - cx, y: innerHeight / 2 - cy, scale: S }, 0)
+      .to(photo, { duration: 0.55, borderTopWidth: 0, borderRightWidth: 0, borderBottomWidth: 0, borderLeftWidth: 0, borderRadius: 0, ease: 'power2.in' }, 0.05)
+      .to(photo, { duration: 0.4, boxShadow: '0 0 0 0 rgba(0,0,0,0)' }, 0.05);
+  }
+
+  // STAGE 6 — hand off to the real History screen, then drop the overlay (same image → no cut)
+  function finishTransition(layer) {
     settleAtHistory();
     const g = window.gsap;
-    const cleanup = () => { layer.remove(); lockScroll(false); if (cassetteEl) { if (g) g.set(cassetteEl, { clearProps: 'all' }); else cassetteEl.style.removeProperty('transform'); } };
+    const cleanup = () => { layer.remove(); lockScroll(false); };
     if (g) g.to(layer, { duration: 0.45, opacity: 0, ease: 'power2.out', onComplete: cleanup });
     else cleanup();
   }
