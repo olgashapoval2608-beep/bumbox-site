@@ -658,11 +658,35 @@
   <section id="moments" class="moments section" data-track="05">
     <div class="container moments__head reveal">
       <p class="track-tag">TRACK 05 / MOMENTS</p>
-      <h2 class="display-h moments__title">Стіна пам’яті</h2>
-      <p class="moments__sub">Двадцять років на плівці — концерти, гастролі, бекстейдж і друзі.<br>Те, що не потрапляє в альбоми.</p>
+      <h2 class="display-h moments__title">Плівка спогадів</h2>
+      <p class="moments__sub">Двадцять років на плівці — концерти, гастролі, друзі.<br>Подивись крізь видошукач, щоб проявити моменти.</p>
     </div>
 
-    <!-- scrapbook memory wall (built by script.js) -->
+    <!-- film camera: look through the viewfinder to develop the memories -->
+    <div class="filmstage">
+      <div class="filmcam" id="filmcam" role="group" aria-label="Плівкова камера">
+        <div class="filmcam__top">
+          <span class="filmcam__lever" aria-hidden="true"></span>
+          <span class="filmcam__dial filmcam__dial--l" aria-hidden="true"></span>
+          <div class="filmcam__prism" aria-hidden="true">
+            <span class="filmcam__pulse" aria-hidden="true"></span>
+            <button class="filmcam__vf" id="filmVf" type="button" aria-label="Подивитись крізь видошукач і проявити фото">
+              <span class="filmcam__vf-glint" aria-hidden="true"></span>
+            </button>
+          </div>
+          <span class="filmcam__dial filmcam__dial--r" aria-hidden="true"></span>
+          <span class="filmcam__shutter" aria-hidden="true"></span>
+        </div>
+        <div class="filmcam__body">
+          <span class="filmcam__lens" aria-hidden="true"><i></i><b></b></span>
+          <span class="filmcam__badge" aria-hidden="true">FILM · 35 MM</span>
+          <span class="filmcam__brand" aria-hidden="true">БУМБОКС</span>
+        </div>
+      </div>
+      <p class="filmcam__hint" id="filmHint"><span>Натисни у видошукач</span></p>
+    </div>
+
+    <!-- developed memories land here as a pile (built by script.js) -->
     <div class="scatter" id="scatter" aria-label="Архів фотографій гурту"></div>
 
     <div class="moments__feature">

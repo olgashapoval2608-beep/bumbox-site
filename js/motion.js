@@ -336,60 +336,152 @@
         card.setAttribute('aria-label', 'Відкрити: ' + (ph.dataset.tag || 'фото'));
       }
     });
-    // staggered reveal + rotation-settle — CSS transitions do the actual motion
-    ScrollTrigger.batch('.photo', {
-      start: 'top 92%',
-      onEnter: (batch) => batch.forEach((b, i) => setTimeout(() => b.classList.add('revealed'), i * 85)),
-    });
     initLightbox(true);
+    setupCamera();
+  }
+
+  /* ---- film camera: click the viewfinder → shutter + flash → develop the pile ---- */
+  function setupCamera() {
+    const moments = $('#moments'), cam = $('#filmcam'), scatter = $('#scatter');
+    if (!moments || !cam || !scatter) return;
+    const photos = $$('.photo', scatter);
+    if (!photos.length) return;
+    moments.classList.add('moments--armed');           // hide photos + reveal the camera (CSS)
+
+    // hover: subtle tilt toward the cursor (desktop pointers only)
+    if (fine) {
+      photos.forEach((ph) => {
+        const card = $('.photo__card', ph); if (!card) return;
+        card.addEventListener('mousemove', (e) => {
+          const r = card.getBoundingClientRect();
+          const dx = (e.clientX - r.left) / r.width - 0.5, dy = (e.clientY - r.top) / r.height - 0.5;
+          card.style.setProperty('--ty', (dx * 12).toFixed(1) + 'deg');
+          card.style.setProperty('--tx', (-dy * 12).toFixed(1) + 'deg');
+        });
+        card.addEventListener('mouseleave', () => { card.style.setProperty('--tx', '0deg'); card.style.setProperty('--ty', '0deg'); });
+      });
+    }
+
+    // viewport-fixed shutter blades + flash (on <body> → no transform-ancestor surprises)
+    const shutter = document.createElement('div'); shutter.className = 'cam-shutter'; shutter.setAttribute('aria-hidden', 'true');
+    const sT = document.createElement('span'); sT.className = 'cam-shutter__t';
+    const sB = document.createElement('span'); sB.className = 'cam-shutter__b';
+    const flash = document.createElement('div'); flash.className = 'cam-flash'; flash.setAttribute('aria-hidden', 'true');
+    shutter.append(sT, sB); document.body.append(shutter, flash);
+
+    let fired = false;
+    function reveal() {
+      if (fired) return; fired = true;
+      moments.classList.add('moments--revealed');       // expands the pile so rects are correct below
+      try { clickSound(); } catch (e) { /* audio is optional */ }
+      const lens = $('.filmcam__lens', cam) || cam;
+      const lr = lens.getBoundingClientRect(); const lcx = lr.left + lr.width / 2, lcy = lr.top + lr.height / 2;
+
+      // shutter close → flash → open
+      gsap.set([shutter, sT, sB, flash], { display: 'block' });
+      gsap.set(sT, { yPercent: -101 }); gsap.set(sB, { yPercent: 101 }); gsap.set(flash, { opacity: 0 });
+      gsap.timeline({ onComplete() { gsap.set([shutter, sT, sB, flash], { display: 'none' }); } })
+        .to(sT, { yPercent: 0, duration: 0.1, ease: 'power2.in' }, 0)
+        .to(sB, { yPercent: 0, duration: 0.1, ease: 'power2.in' }, 0)
+        .to(flash, { opacity: 0.85, duration: 0.05 }, 0.1)
+        .to(flash, { opacity: 0, duration: 0.32 }, 0.16)
+        .to(sT, { yPercent: -101, duration: 0.18, ease: 'power2.out' }, 0.18)
+        .to(sB, { yPercent: 101, duration: 0.18, ease: 'power2.out' }, 0.18);
+
+      gsap.to(cam, { scale: 0.92, y: -8, opacity: 0.85, duration: 0.6, ease: 'power2.out', delay: 0.15 });
+
+      // each memory develops out of the lens, arcs, rotates and lands with a soft bounce
+      photos.forEach((ph, i) => {
+        const pr = ph.getBoundingClientRect();
+        const dx = lcx - (pr.left + pr.width / 2);
+        const dy = lcy - (pr.top + pr.height / 2);
+        const spin = (i % 2 ? 1 : -1) * (16 + (i * 13) % 26);
+        gsap.fromTo(ph,
+          { x: dx, y: dy, scale: 0.22, rotation: spin, opacity: 0, transformOrigin: '50% 50%' },
+          { keyframes: [
+              { opacity: 1, duration: 0.12 },
+              { x: dx * 0.4, y: dy * 0.4 - 44, scale: 0.6, rotation: spin * 0.4, duration: 0.32, ease: 'power1.out' },
+              { x: 0, y: 0, scale: 1, rotation: 0, duration: 0.5, ease: 'back.out(1.2)' },
+            ],
+            delay: 0.26 + i * 0.05,
+            onComplete() { ph.style.opacity = ''; ph.style.transform = ''; },   // hand back to CSS
+          });
+      });
+    }
+    const vf = $('#filmVf') || cam;
+    vf.addEventListener('click', (e) => { e.stopPropagation(); reveal(); });
+    cam.addEventListener('click', reveal);
+  }
+
+  function clickSound() {
+    const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
+    const ctx = new AC();
+    const n = Math.floor(ctx.sampleRate * 0.08);
+    const buf = ctx.createBuffer(1, n, ctx.sampleRate); const d = buf.getChannelData(0);
+    for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / n, 2.4);   // soft shutter click
+    const src = ctx.createBufferSource(); src.buffer = buf;
+    const g = ctx.createGain(); g.gain.value = 0.06;            // quiet & muted-friendly
+    src.connect(g); g.connect(ctx.destination); src.start();
+    src.onended = () => { try { ctx.close(); } catch (e) { /* noop */ } };
   }
 
   /* ---- clean fullscreen lightbox: FLIP from the thumb, show the full photo --- */
   function initLightbox(animated) {
     const photos = $$('.photo');
     if (!photos.length) return;
+    const navPhotos = photos.filter((ph) => { const im = $('.photo__img', ph); return im && im.tagName === 'IMG'; });
     const box = document.createElement('div');
     box.className = 'lightbox'; box.setAttribute('aria-hidden', 'true');
     const pic = document.createElement('img'); pic.className = 'lightbox__pic'; pic.alt = '';
     const cap = document.createElement('p'); cap.className = 'lightbox__cap';
-    const close = document.createElement('button'); close.className = 'lightbox__close'; close.type = 'button';
-    close.textContent = 'Закрити ✕'; close.setAttribute('aria-label', 'Закрити');
-    box.appendChild(pic); box.appendChild(cap); box.appendChild(close); document.body.appendChild(box);
-    let from = null;
+    const mkBtn = (cls, txt, label) => { const b = document.createElement('button'); b.className = cls; b.type = 'button'; b.textContent = txt; b.setAttribute('aria-label', label); return b; };
+    const prevB = mkBtn('lightbox__nav lightbox__nav--prev', '‹', 'Попереднє фото');
+    const nextB = mkBtn('lightbox__nav lightbox__nav--next', '›', 'Наступне фото');
+    const close = mkBtn('lightbox__close', 'Закрити ✕', 'Закрити');
+    box.append(pic, cap, prevB, nextB, close); document.body.appendChild(box);
+    let from = null, idx = -1;
 
     const px = (o) => ({ left: o.left + 'px', top: o.top + 'px', width: o.width + 'px', height: o.height + 'px' });
     function target() {
       const ar = (pic.naturalWidth && pic.naturalHeight) ? pic.naturalWidth / pic.naturalHeight : 0.8;
       const maxW = window.innerWidth * 0.9, maxH = window.innerHeight * 0.84;
-      let w = maxW, h = w / ar;
-      if (h > maxH) { h = maxH; w = h * ar; }
+      let w = maxW, h = w / ar; if (h > maxH) { h = maxH; w = h * ar; }
       return { left: (window.innerWidth - w) / 2, top: (window.innerHeight - h) / 2, width: w, height: h };
     }
-    function grow(r) {
-      const t = target();
-      if (animated && window.gsap) gsap.fromTo(pic, { left: r.left, top: r.top, width: r.width, height: r.height }, Object.assign({ duration: 0.55, ease: 'power3.inOut' }, t));
-      else Object.assign(pic.style, px(t));
+    function load(url, cb) {
+      if (pic.getAttribute('src') === url && pic.complete && pic.naturalWidth) cb();
+      else { pic.onload = cb; pic.setAttribute('src', url); }
     }
     function open(ph) {
       const imgEl = $('.photo__img', ph);
-      if (!imgEl || imgEl.tagName !== 'IMG') return;   // video tiles use a <div>, not <img> → no lightbox
-      const url = imgEl.getAttribute('src');
-      from = ph;
-      const r = (imgEl || ph).getBoundingClientRect();
+      if (!imgEl || imgEl.tagName !== 'IMG') return;    // video tiles → no lightbox
+      from = ph; idx = navPhotos.indexOf(ph);
       cap.textContent = ph.dataset.tag || '';
       box.classList.add('open'); box.setAttribute('aria-hidden', 'false');
-      pic.style.display = 'block';
+      pic.style.display = 'block'; pic.style.opacity = '1';
+      const r = imgEl.getBoundingClientRect();
       Object.assign(pic.style, px(r));                  // start exactly over the thumbnail
-      const go = () => grow(r);
-      if (pic.getAttribute('src') !== url) pic.setAttribute('src', url);
-      if (pic.complete && pic.naturalWidth) go(); else pic.onload = go;
+      load(imgEl.getAttribute('src'), () => {
+        const t = target();
+        if (animated && window.gsap) gsap.fromTo(pic, { left: r.left, top: r.top, width: r.width, height: r.height }, Object.assign({ duration: 0.55, ease: 'power3.inOut' }, t));
+        else Object.assign(pic.style, px(t));
+      });
       close.focus();
+    }
+    function go(dir) {
+      if (idx < 0 || navPhotos.length < 2) return;
+      idx = (idx + dir + navPhotos.length) % navPhotos.length;
+      const ph = navPhotos[idx]; from = ph;
+      const url = $('.photo__img', ph).getAttribute('src');
+      const place = () => { Object.assign(pic.style, px(target())); cap.textContent = ph.dataset.tag || ''; if (window.gsap) gsap.fromTo(pic, { opacity: 0.15 }, { opacity: 1, duration: 0.3 }); else pic.style.opacity = '1'; };
+      if (window.gsap) gsap.to(pic, { opacity: 0.15, duration: 0.15, onComplete: () => load(url, place) });
+      else load(url, place);
     }
     function shut() {
       if (!from) { box.classList.remove('open'); return; }
       const r = ($('.photo__img', from) || from).getBoundingClientRect();
-      const done = () => { box.classList.remove('open'); box.setAttribute('aria-hidden', 'true'); pic.style.display = 'none'; from = null; };
-      if (animated && window.gsap) gsap.to(pic, { left: r.left, top: r.top, width: r.width, height: r.height, duration: 0.45, ease: 'power3.inOut', onComplete: done });
+      const done = () => { box.classList.remove('open'); box.setAttribute('aria-hidden', 'true'); pic.style.display = 'none'; pic.style.opacity = ''; from = null; };
+      if (animated && window.gsap) gsap.to(pic, { left: r.left, top: r.top, width: r.width, height: r.height, opacity: 1, duration: 0.45, ease: 'power3.inOut', onComplete: done });
       else done();
     }
 
@@ -398,9 +490,16 @@
       hit.addEventListener('click', () => open(ph));
       hit.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(ph); } });
     });
+    prevB.addEventListener('click', (e) => { e.stopPropagation(); go(-1); });
+    nextB.addEventListener('click', (e) => { e.stopPropagation(); go(1); });
     close.addEventListener('click', shut);
     box.addEventListener('click', (e) => { if (e.target === box) shut(); });
-    addEventListener('keydown', (e) => { if (e.key === 'Escape' && box.classList.contains('open')) shut(); });
+    addEventListener('keydown', (e) => {
+      if (!box.classList.contains('open')) return;
+      if (e.key === 'Escape') shut();
+      else if (e.key === 'ArrowLeft') go(-1);
+      else if (e.key === 'ArrowRight') go(1);
+    });
   }
 
   /* ================================================================

@@ -380,7 +380,7 @@
     { f: 'foto-2004', t: '2004', ar: 1.1 },
   ];
   // deterministic decoration data → the composition reads as intentional and stays stable on reload
-  const ROTS = [-3.4, 2.6, -1.8, 3.2, -2.5, 1.6, -3.1, 2.2, -1.3, 2.9];
+  const ROTS = [-7.5, 5.5, -3.2, 8, -6, 4.2, -8, 6.4, -2.4, 7, -5.2, 3.4];
   const STAMPS = ['12·08·04', '03·11·07', '27·06·09', '14·09·12', '08·05·15', '19·02·18', '30·07·21', '05·12·22'];
   const LABELS = ['АРХІВ', 'ПЛІВКА', 'LIVE', 'ТУР', 'BACKSTAGE', '35 ММ'];
   const deco = (cls, txt) => { const s = document.createElement('span'); s.className = cls; if (txt) s.textContent = txt; return s; };
@@ -389,9 +389,8 @@
     const ph = document.createElement('figure');
     ph.className = it.v ? 'photo photo--video' : 'photo';
     ph.dataset.tag = it.t;
+    ph.dataset.ar = it.ar;
     ph.style.setProperty('--rot', ROTS[i % ROTS.length] + 'deg');
-    if (i % 5 === 3) ph.classList.add('photo--tuck');   // tuck under the card above → depth + overlap
-    if (i % 7 === 5) ph.classList.add('photo--lift');
 
     const card = document.createElement('div');
     card.className = 'photo__card';
@@ -429,14 +428,49 @@
     return ph;
   };
   if (scatter) {
-    momentItems.forEach((it, i) => scatter.appendChild(makeTile(it, i)));   // CSS columns lay out the wall
+    momentItems.forEach((it, i) => scatter.appendChild(makeTile(it, i)));
+    layoutPile();
+    let pileT;
+    addEventListener('resize', () => { clearTimeout(pileT); pileT = setTimeout(layoutPile, 180); });
+  }
+
+  // lay the developed photos into a controlled "pile on a table" (masonry pack + seeded jitter → stable)
+  function layoutPile() {
+    if (!scatter) return;
+    const photos = $$('.photo', scatter);
+    if (!photos.length) return;
+    const seed = (n) => { const x = Math.sin(n * 99.13) * 43758.5453; return x - Math.floor(x); };
+    const W = scatter.clientWidth || Math.min(1180, innerWidth * 0.92);
+    const mobile = innerWidth <= 680;
+    const cols = innerWidth >= 1000 ? 5 : (innerWidth >= 680 ? 3 : 2);
+    const colW = W / cols;
+    const photoW = Math.round(colW * (mobile ? 0.92 : 0.9));
+    const gap = mobile ? 16 : 8;
+    const colH = new Array(cols).fill(mobile ? 6 : 14);
+    let maxH = 0;
+    photos.forEach((ph, i) => {
+      const ar = +ph.dataset.ar || 0.8;
+      const cardH = photoW * (0.25 + 0.86 / ar);          // estimated polaroid height (frame + photo)
+      let c = 0; for (let k = 1; k < cols; k++) if (colH[k] < colH[c]) c = k;   // shortest column
+      const jx = mobile ? 0 : (seed(i) - 0.5) * 0.16 * colW;
+      const jy = mobile ? 0 : (seed(i + 50) - 0.5) * 22;
+      const left = c * colW + (colW - photoW) / 2 + jx;
+      const top = colH[c] + jy;
+      ph.style.width = photoW + 'px';
+      ph.style.left = Math.max(0, Math.min(W - photoW, left)) + 'px';
+      ph.style.top = Math.max(0, top) + 'px';
+      ph.style.zIndex = mobile ? 1 : (1 + (i % 6));
+      colH[c] = top + cardH + gap;
+      maxH = Math.max(maxH, colH[c]);
+    });
+    scatter.style.height = Math.round(maxH + (mobile ? 24 : 44)) + 'px';
   }
 
   // archive marquee (Screen 1) — concert/backstage frames only, no captions
   const archiveRow = $('#archiveRow');
   if (archiveRow) {
     const archiveImgs = ['foto-bigshow', 'foto-concerts', 'foto-festival', 'foto-allofus', 'foto-fire',
-      'foto-club', 'foto-bus', 'foto-fan', 'foto-vibe', 'foto-atmosfera', 'concert-big', 'concert-festival'];
+      'foto-club', 'foto-bus', 'foto-fan', 'foto-vibe', 'foto-atmosfera', 'concert-festival'];
     archiveRow.textContent = '';
     for (let pass = 0; pass < 2; pass++) {           // duplicate the set so the marquee loops seamlessly
       archiveImgs.forEach((name) => {
