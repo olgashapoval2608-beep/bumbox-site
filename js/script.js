@@ -49,7 +49,6 @@
   const display = $('#displayText');
   const displaySub = $('#displaySub');
   const playHint = $('#playHint');
-  const warp = $('.warp');
 
   // mobile: the spec wants a tap-friendly label
   if ((isTouch || innerWidth <= 720) && playHint) playHint.textContent = 'Торкнись PLAY';
@@ -67,54 +66,151 @@
       if (displayEl) displayEl.classList.remove('blink');
       display.textContent = 'БУМБОКС';
     });
-    playBtn.addEventListener('click', startStory);
+    playBtn.addEventListener('click', playTransition);
   }
 
-  function flashWave() {
-    boombox.classList.remove('wave');
-    void boombox.offsetWidth;        // restart animation
-    boombox.classList.add('wave');
+  /* =================================================================
+     PLAY → HISTORY — cinematic cassette transition
+     The deck comes alive, the compartment ejects, ONE instant photo develops
+     and rises, then zooms up and *becomes* the fullscreen TRACK 01 / «2004 —
+     Київ» screen. The same history-banner.jpg is used by the instant photo and
+     the real hero-zoom end-state, so the hand-off has no hard cut. GPU
+     transforms, ~3s. Degrades to a plain settle when GSAP is unavailable or
+     reduced-motion is requested.
+     ================================================================= */
+  let trDone = false, scrollLocked = false;
+
+  const blockScroll = (e) => e.preventDefault();
+  const blockKeys = (e) => { if (['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' ', 'Spacebar'].includes(e.key)) e.preventDefault(); };
+  function lockScroll(on) {
+    if (on === scrollLocked) return; scrollLocked = on;
+    const m = on ? 'addEventListener' : 'removeEventListener';
+    window[m]('wheel', blockScroll, { passive: false });
+    window[m]('touchmove', blockScroll, { passive: false });
+    window[m]('keydown', blockKeys, { passive: false });
   }
 
-  function startStory() {
-    if (boombox.classList.contains('playing')) { goTo('#history'); return; }
-    boombox.classList.remove('hovering');
-    if (displayEl) displayEl.classList.remove('blink');
-    boombox.classList.add('playing', 'vibe');
-    flashWave();
-
-    const seq = [
-      ['PLAY', 'press'],
-      ['TRACK 01', 'history'],
-      ['ІСТОРІЯ', '2004 → ∞'],
-      ['2004 →', 'сьогодні'],
-    ];
-    let i = 0;
-    display.textContent = 'PLAY';
-    displaySub.textContent = 'rec';
-    const tick = setInterval(() => {
-      if (i >= seq.length) {
-        clearInterval(tick);
-        warpToHistory();
-        return;
+  // soft, optional cassette sounds — only fire on the user's click (autoplay-safe)
+  let _actx;
+  function cassetteSound(kind) {
+    try {
+      const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
+      _actx = _actx || new AC(); const ctx = _actx, t = ctx.currentTime;
+      if (kind === 'click') {                       // sharp mechanical click (noise burst)
+        const n = Math.floor(ctx.sampleRate * 0.05), buf = ctx.createBuffer(1, n, ctx.sampleRate), d = buf.getChannelData(0);
+        for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / n, 3);
+        const s = ctx.createBufferSource(); s.buffer = buf; const g = ctx.createGain(); g.gain.value = 0.08;
+        s.connect(g); g.connect(ctx.destination); s.start();
+      } else {                                       // motor hum that ramps in, then a click
+        const o = ctx.createOscillator(); o.type = 'square'; o.frequency.value = 56;
+        const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 300;
+        const g = ctx.createGain();
+        g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(0.035, t + 0.15);
+        g.gain.linearRampToValueAtTime(0.022, t + 1.4); g.gain.linearRampToValueAtTime(0, t + 3.1);
+        o.connect(lp); lp.connect(g); g.connect(ctx.destination); o.start(t); o.stop(t + 3.1);
+        cassetteSound('click');
       }
-      display.textContent = seq[i][0];
-      displaySub.textContent = seq[i][1];
-      flashWave();
-      i++;
-    }, reduceMotion ? 120 : 520);
+    } catch (e) { /* audio is optional */ }
   }
 
-  function warpToHistory() {
-    if (reduceMotion) { goTo('#history'); return; }
-    // position warp circle over the right speaker
-    const sp = $('#warpSpeaker').getBoundingClientRect();
-    warp.style.left = (sp.left + sp.width / 2) + 'px';
-    warp.style.top = (sp.top + sp.height / 2) + 'px';
-    warp.classList.remove('go'); void warp.offsetWidth; warp.classList.add('go');
-    // jump instantly while the warp covers the screen (hero is now a tall sticky zone)
-    setTimeout(() => { const h = $('#history'); if (!h) return; if (window.__lenis) window.__lenis.scrollTo(h, { immediate: true }); else h.scrollIntoView({ behavior: 'auto' }); }, 600);
-    setTimeout(() => warp.classList.remove('go'), 1300);
+  // settle the page at the real end-of-hero state: fullscreen photo + «2004 — Київ»
+  function settleAtHistory() {
+    boombox.classList.remove('playing', 'vibe', 'hovering');
+    if (heroZone) heroZone.classList.remove('tr-playing');   // hand copy control back to the scroll-zoom
+    if (displayEl) displayEl.classList.remove('glow', 'blink');
+    boombox.style.removeProperty('animation');
+    const total = heroZone ? heroZone.offsetHeight - innerHeight : 0;
+    if (!reduceMotion && innerWidth > 720 && total > 0) {
+      window.scrollTo(0, total);
+      updateHeroZoom();                              // paint the end-state right away
+    } else {
+      const h = $('#history'); if (h) h.scrollIntoView({ behavior: 'auto' });
+    }
+  }
+
+  function playTransition() {
+    if (trDone) { settleAtHistory(); lockScroll(false); return; }
+    trDone = true;
+    const g = window.gsap;
+    if (reduceMotion || !g || innerWidth <= 720) { settleAtHistory(); return; }
+
+    const cassetteEl = $('.cassette'), cassetteWinEl = $('.cassette__window');
+    if (!cassetteEl || !cassetteWinEl || !boombox) { settleAtHistory(); return; }
+
+    boombox.classList.add('playing', 'vibe');        // reels spin + speakers vibrate
+    if (heroZone) heroZone.classList.add('tr-playing'); // fade the resting hero copy out of the way
+    if (displayEl) displayEl.classList.add('glow');
+    window.scrollTo(0, 0);                            // keep the deck centred while it plays
+    lockScroll(true);
+    cassetteSound('mech');
+
+    // overlay holding the developing photo (built lazily, removed at the end)
+    const layer = document.createElement('div');
+    layer.className = 'tr'; layer.id = 'playTr'; layer.setAttribute('aria-hidden', 'true');
+    layer.innerHTML = '<div class="tr__vignette"></div><div class="tr__spot"></div><div class="tr__win"><div class="tr__img"></div><div class="tr__develop"></div><div class="tr__grain"></div></div>';
+    document.body.appendChild(layer);
+    const vignette = layer.querySelector('.tr__vignette');
+    const spot = layer.querySelector('.tr__spot');
+    const win = layer.querySelector('.tr__win');
+    const img = layer.querySelector('.tr__img');
+    const develop = layer.querySelector('.tr__develop');
+
+    // preview geometry (centred), from the banner's 700×434 ratio
+    const AR = 700 / 434;
+    const W = Math.min(440, innerWidth * 0.34, innerHeight * 0.5 * AR), H = W / AR;
+    const PL = (innerWidth - W) / 2, PT = (innerHeight - H) / 2;
+    Object.assign(win.style, { left: PL + 'px', top: PT + 'px', width: W + 'px', height: H + 'px' });
+    const cx = PL + W / 2, cy = PT + H / 2;
+
+    // transform that places the photo small, inside the cassette window (read live)
+    const fromCassette = () => {
+      const r = cassetteWinEl.getBoundingClientRect();
+      return { x: (r.left + r.width / 2) - cx, y: (r.top + r.height / 2) - cy + 24, scale: Math.max(0.06, r.width / W) };
+    };
+    // transform that scales the photo to cover the whole viewport
+    const toFull = () => {
+      const S = Math.max(innerWidth / W, innerHeight / H) * 1.02;
+      return { x: innerWidth / 2 - cx, y: innerHeight / 2 - cy, scale: S };
+    };
+
+    const tl = g.timeline({ defaults: { ease: 'power2.inOut' }, onComplete: () => finishTransition(layer, cassetteEl) });
+
+    // STAGE 1 — the deck comes alive: turns to face the viewer, glows, dims the room
+    display.textContent = 'PLAY'; displaySub.textContent = 'rec';
+    boombox.style.animation = 'none';
+    g.set(boombox, { transformPerspective: 1400, rotationX: 6, rotationY: -7, scale: 1 });
+    tl.to(boombox, { duration: 0.6, ease: 'power3.out', rotationX: 0, rotationY: 0, scale: 1.2 }, 0);
+    tl.to(vignette, { duration: 0.6, opacity: 1 }, 0);
+    tl.to(spot, { duration: 0.65, opacity: 1, ease: 'power2.out' }, 0);            // warm "comes alive" glow
+    tl.add(() => { display.textContent = 'TRACK 01'; displaySub.textContent = 'історія'; }, 0.42);
+
+    // STAGE 2 — compartment ejects (subtle, mechanical) + a click
+    tl.to(cassetteEl, { duration: 0.5, yPercent: -13, ease: 'power2.out' }, 0.6);
+    tl.add(() => cassetteSound('click'), 0.64);
+
+    // STAGE 3 — ONE instant photo: white border first, slides up, develops, analog flicker
+    tl.add(() => g.set(win, Object.assign({ opacity: 0 }, fromCassette())), 0.64);
+    tl.to(win, { duration: 0.22, opacity: 1 }, 0.7);                                   // border appears
+    tl.to(win, { duration: 0.72, x: 0, y: 0, scale: 1, ease: 'power2.out' }, 0.78);    // slides up + grows
+    tl.to(develop, { duration: 0.72, opacity: 0, ease: 'power1.inOut' }, 0.9);         // image develops
+    tl.fromTo(img, { filter: 'brightness(.2) contrast(1.35) saturate(.55) blur(4px)' },
+                   { duration: 0.72, filter: 'brightness(1) contrast(1) saturate(1) blur(0px)', ease: 'power1.inOut' }, 0.9);
+    tl.to(win, { duration: 0.05, opacity: 0.8, repeat: 5, yoyo: true }, 0.98);         // analog flicker
+    tl.set(win, { opacity: 1 }, 1.5);
+
+    // ~0.5s pause, then STAGE 4 — zoom up; the white border disappears → becomes History
+    tl.to(win, Object.assign({ duration: 0.95, ease: 'power3.inOut' }, toFull()), 2.05);
+    tl.to(win, { duration: 0.5, borderTopWidth: 0, borderRightWidth: 0, borderBottomWidth: 0, borderLeftWidth: 0, borderRadius: 0, ease: 'power2.in' }, 2.1);
+    tl.to(win, { duration: 0.4, boxShadow: '0 0 0 0 rgba(0,0,0,0)' }, 2.1);
+  }
+
+  // STAGE 5 — hand off to the real History screen, then drop the overlay (same image → no cut)
+  function finishTransition(layer, cassetteEl) {
+    settleAtHistory();
+    const g = window.gsap;
+    const cleanup = () => { layer.remove(); lockScroll(false); if (cassetteEl) { if (g) g.set(cassetteEl, { clearProps: 'all' }); else cassetteEl.style.removeProperty('transform'); } };
+    if (g) g.to(layer, { duration: 0.45, opacity: 0, ease: 'power2.out', onComplete: cleanup });
+    else cleanup();
   }
 
   function goTo(sel) {
