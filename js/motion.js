@@ -160,6 +160,7 @@ body.scroll-locked,body.nav-locked{overflow:hidden;touch-action:none}
     gsap.registerPlugin(ScrollTrigger);
     animateHeroEntrance();
     revealOnScroll();
+    revealHistoryMedia();
     setupParallax();
     setupMagneticButtons();
     setupCardHoverPress();
@@ -193,6 +194,19 @@ body.scroll-locked,body.nav-locked{overflow:hidden;touch-action:none}
 
     const merchItems = $$('.mcard');
     merchItems.forEach((el, index) => el.style.setProperty('--reveal-index', index));
+  }
+
+  function revealHistoryMedia() {
+    const scenes = $$('.doc-scene');
+    if (!scenes.length) return;
+    scenes.forEach((scene, index) => {
+      ScrollTrigger.create({
+        trigger: scene,
+        start: 'top 86%',
+        once: true,
+        onEnter: () => setTimeout(() => scene.classList.add('media-in'), Math.min(index, 5) * 70),
+      });
+    });
   }
 
   function setupParallax() {
