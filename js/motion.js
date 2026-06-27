@@ -22,6 +22,7 @@
   const hasGSAP = !!gsap && !!ScrollTrigger;
 
   installMobileStyles();
+  installPerformanceTuning();
 
   function installMobileStyles() {
     if (document.getElementById('bumbox-mobile-css')) return;
@@ -31,6 +32,55 @@
     link.href = 'css/mobile.css';
     link.media = '(max-width: 720px)';
     document.head.appendChild(link);
+  }
+
+  function installPerformanceTuning() {
+    if (!document.getElementById('bumbox-scroll-perf-css')) {
+      const style = document.createElement('style');
+      style.id = 'bumbox-scroll-perf-css';
+      style.textContent = `
+        @media (min-width: 721px) {
+          .hero { min-height: 165vh !important; }
+          .doc-stage { height: 255vh !important; margin-top: 5vh !important; }
+          .albums__scroller { height: 340vh !important; }
+        }
+        @media (pointer: fine) {
+          .cursor {
+            will-change: transform;
+            transform: translate3d(-50%, -50%, 0);
+          }
+          .cursor__wave {
+            animation: none !important;
+            opacity: .18;
+          }
+          .cursor-light {
+            display: none !important;
+          }
+        }
+        @media (max-width: 1024px) {
+          .grain {
+            animation: none !important;
+            opacity: .03;
+          }
+          .stage-lights .beam {
+            animation: none !important;
+          }
+        }
+      `;
+      document.head.appendChild(style);
+    }
+
+    const cursor = $('.cursor');
+    if (cursor && matchMedia('(pointer: fine)').matches) {
+      let frame = 0;
+      const place = (x, y) => {
+        cursor.style.transform = `translate(${x}px,${y}px) translate(-50%,-50%)`;
+      };
+      addEventListener('mousemove', (e) => {
+        cancelAnimationFrame(frame);
+        frame = requestAnimationFrame(() => place(e.clientX, e.clientY));
+      }, { passive: true });
+    }
   }
   function finishLoader() { if (loader) loader.classList.add('is-done'); }
 
@@ -546,3 +596,4 @@
     revealAllFallback();
   }
 })();
+
