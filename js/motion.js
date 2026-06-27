@@ -1,15 +1,13 @@
 /* =================================================================
    БУМБОКС — MOTION LAYER
-   Premium smooth scrolling, responsive refinements, and a no-cut
-   cassette-to-history transition. This file is a progressive layer over
-   the existing static site: branding, colors, typography, navigation,
-   cassette concept, and storytelling stay intact.
+   Smooth scroll, responsive refinements, and the cassette-to-history
+   transition. Progressive enhancement over the existing static site.
    ================================================================= */
 (function () {
   'use strict';
 
-  const $ = (s, c = document) => c.querySelector(s);
-  const $$ = (s, c = document) => Array.from(c.querySelectorAll(s));
+  const $ = (selector, context = document) => context.querySelector(selector);
+  const $$ = (selector, context = document) => Array.from(context.querySelectorAll(selector));
   const root = document.documentElement;
   const body = document.body;
   const reduceMotion = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -17,6 +15,7 @@
   const gsap = window.gsap;
   const ScrollTrigger = window.ScrollTrigger;
   const Lenis = window.Lenis;
+  const historyPhotoUrl = 'assets/history-banner.jpg';
 
   let lenis = null;
   let scrollLocked = false;
@@ -28,12 +27,10 @@
   if (!reduceMotion && gsap) root.classList.add('js-motion');
   finishLoader();
   setupLenis();
-  setupNavPolish();
+  setupNavigation();
   setupPlayJourney();
-  setupReducedMotionFallback();
   setupMotionEnhancements();
-  setupMomentsExperience();
-  setupLightbox();
+  setupMoments();
 
   function installRefinementStyles() {
     const style = document.createElement('style');
@@ -42,22 +39,20 @@
 html,body{max-width:100%;overflow-x:clip}
 html.lenis,html.lenis body{height:auto}
 .lenis.lenis-smooth{scroll-behavior:auto!important}
-.lenis.lenis-smooth [data-lenis-prevent]{overscroll-behavior:contain}
 .lenis.lenis-stopped{overflow:hidden}
 body.scroll-locked,body.nav-locked{overflow:hidden;touch-action:none}
 .js-motion .boombox,.js-motion .hero__eyebrow,.js-motion .hero__title,.js-motion .hero__lead,.js-motion .hero__cta,.js-motion .scroll-cue{animation:none;opacity:1}
-.js-motion .boombox{will-change:transform,opacity;transform:perspective(1400px) rotateX(6deg) rotateY(-7deg)}
 .btn,.topnav__cta,.ctrl,.mtab,.album__open,.footer__again{transition:transform .25s var(--ease),box-shadow .3s var(--ease),background .3s var(--ease),color .3s var(--ease),border-color .3s var(--ease)}
 .btn:active,.topnav__cta:active,.ctrl:active,.mtab:active,.album__open:active,.footer__again:active{transform:translateY(1px) scale(.985)}
 .topnav{transition:background .35s var(--ease),box-shadow .35s var(--ease),backdrop-filter .35s var(--ease)}
 .topnav.scrolled{background:rgba(7,7,7,.76);box-shadow:0 10px 32px rgba(0,0,0,.42);backdrop-filter:blur(15px) saturate(1.15);-webkit-backdrop-filter:blur(15px) saturate(1.15)}
 .topnav__actions{flex-shrink:0}.topnav__cta{position:relative;z-index:64;flex-shrink:0}
-.hero{overflow:hidden}.hero-photo{background-image:url('../assets/history-banner.jpg');background-position:center;background-size:cover}
+.hero{overflow:hidden}.hero-photo{background-image:url('${historyPhotoUrl}');background-position:center;background-size:cover}
 .hero.hero--history-settled .hero-photo{opacity:1!important;transform:scale(1)!important;border-radius:0!important;transform-origin:50% 50%!important}
 .hero.hero--history-settled .hero-intro{opacity:1!important}
 .hero.hero--history-settled .boombox,.hero.hero--history-settled .hero__eyebrow,.hero.hero--history-settled .hero__title,.hero.hero--history-settled .hero__lead,.hero.hero--history-settled .hero__cta,.hero.hero--history-settled .scroll-cue,.hero.hero--history-settled .deco-label{opacity:0!important;pointer-events:none!important;visibility:hidden!important}
 .tr__photo.is-flying{overflow:hidden;will-change:left,top,width,height,border-width,border-radius,box-shadow;transform:none!important;backface-visibility:hidden;contain:layout paint}
-.tr__photo.is-flying .tr__img{background-image:url('../assets/history-banner.jpg');background-position:center;background-size:cover}
+.tr__photo.is-flying .tr__img{background-image:url('${historyPhotoUrl}');background-position:center;background-size:cover}
 .tr__photo.is-flying .tr__develop{opacity:0!important}.tr__photo.is-flying .tr__grain{will-change:opacity}
 .tr__cassette .tr__reel::after{animation:spin .85s linear infinite}
 .motion-reveal{will-change:transform,opacity}.motion-parallax{will-change:transform}.tourdate,.poster,.mcard{transform:translateZ(0)}
@@ -82,13 +77,10 @@ body.scroll-locked,body.nav-locked{overflow:hidden;touch-action:none}
       setTimeout(done, 900);
       return;
     }
-    const logo = $('.loader__logo', loader);
-    const bar = $('.loader__bar', loader);
-    const fill = $('.loader__bar i', loader);
     gsap.timeline({ defaults: { ease: 'power3.out' }, onComplete: done })
-      .to(logo, { opacity: 1, scale: 1.04, duration: 0.45 })
-      .to(bar, { opacity: 1, duration: 0.18 }, '<')
-      .to(fill, { width: '100%', duration: 0.62, ease: 'power1.inOut' }, '<+0.05')
+      .to($('.loader__logo', loader), { opacity: 1, scale: 1.04, duration: 0.45 })
+      .to($('.loader__bar', loader), { opacity: 1, duration: 0.18 }, '<')
+      .to($('.loader__bar i', loader), { width: '100%', duration: 0.62, ease: 'power1.inOut' }, '<+0.05')
       .to(loader, { opacity: 0, duration: 0.5, ease: 'power2.inOut' }, '+=0.08');
     setTimeout(done, 2600);
   }
@@ -122,24 +114,23 @@ body.scroll-locked,body.nav-locked{overflow:hidden;touch-action:none}
     }
   }
 
-  function setupNavPolish() {
+  function setupNavigation() {
     const nav = $('#topnav');
     const burger = $('#navBurger');
     if (!nav) return;
-    const glass = () => nav.classList.toggle('scrolled', scrollY > 38);
-    addEventListener('scroll', glass, { passive: true });
-    glass();
+    const setGlass = () => nav.classList.toggle('scrolled', scrollY > 38);
+    addEventListener('scroll', setGlass, { passive: true });
+    setGlass();
 
-    const reflectMenu = () => {
+    const syncMenu = () => {
       const open = nav.classList.contains('open');
       body.classList.toggle('nav-locked', open);
       if (!lenis) return;
       if (open) lenis.stop();
       else if (!scrollLocked) lenis.start();
     };
-    new MutationObserver(reflectMenu).observe(nav, { attributes: true, attributeFilter: ['class'] });
-    if (burger) burger.addEventListener('click', () => requestAnimationFrame(reflectMenu));
-    reflectMenu();
+    new MutationObserver(syncMenu).observe(nav, { attributes: true, attributeFilter: ['class'] });
+    if (burger) burger.addEventListener('click', () => requestAnimationFrame(syncMenu));
 
     document.addEventListener('click', (event) => {
       const link = event.target.closest('a[href="#hero"]');
@@ -150,34 +141,36 @@ body.scroll-locked,body.nav-locked{overflow:hidden;touch-action:none}
     }, true);
   }
 
-  function setupReducedMotionFallback() {
-    if (!reduceMotion) return;
-    $$('.reveal').forEach((el) => el.classList.add('in'));
-  }
-
   function setupMotionEnhancements() {
-    if (reduceMotion || !gsap || !ScrollTrigger) return;
+    if (reduceMotion) {
+      $$('.reveal').forEach((el) => el.classList.add('in'));
+      return;
+    }
+    if (!gsap || !ScrollTrigger) return;
     gsap.registerPlugin(ScrollTrigger);
-    animateHeroEntrance();
-    revealOnScroll();
-    revealHistoryMedia();
-    setupParallax();
-    setupMagneticButtons();
-    setupCardHoverPress();
-    requestAnimationFrame(() => ScrollTrigger.refresh());
-    addEventListener('load', () => ScrollTrigger.refresh(), { once: true });
-  }
 
-  function animateHeroEntrance() {
-    const pieces = ['.hero__eyebrow', '.boombox', '.hero__title', '.hero__lead', '.hero__cta'].map((s) => $(s)).filter(Boolean);
-    gsap.from(pieces, { opacity: 0, y: 26, scale: 0.985, duration: 0.78, stagger: 0.08, ease: 'power3.out', delay: 0.25, clearProps: 'opacity,transform' });
-  }
+    const introPieces = ['.hero__eyebrow', '.boombox', '.hero__title', '.hero__lead', '.hero__cta']
+      .map((selector) => $(selector)).filter(Boolean);
+    gsap.from(introPieces, {
+      opacity: 0,
+      y: 26,
+      scale: 0.985,
+      duration: 0.78,
+      stagger: 0.08,
+      ease: 'power3.out',
+      delay: 0.25,
+      clearProps: 'opacity,transform',
+    });
 
-  function revealOnScroll() {
-    const headings = $$('.albums__title,.tours__head,.tourlist__head,.merch__head,.moments__head,.footer__sub');
-    headings.forEach((el) => {
+    $$('.albums__title,.tours__head,.tourlist__head,.merch__head,.moments__head,.footer__sub').forEach((el) => {
       el.classList.add('motion-reveal');
-      gsap.from(el, { opacity: 0, y: 30, duration: 0.9, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 84%', once: true } });
+      gsap.from(el, {
+        opacity: 0,
+        y: 30,
+        duration: 0.9,
+        ease: 'power3.out',
+        scrollTrigger: { trigger: el, start: 'top 84%', once: true },
+      });
     });
 
     const cards = $$('.poster,.tourdate,.mcard');
@@ -187,19 +180,19 @@ body.scroll-locked,body.nav-locked{overflow:hidden;touch-action:none}
         interval: 0.08,
         batchMax: 8,
         start: 'top 88%',
-        onEnter: (batch) => gsap.to(batch, { opacity: 1, y: 0, duration: 0.62, stagger: 0.055, ease: 'power3.out', overwrite: true }),
+        onEnter: (batch) => gsap.to(batch, {
+          opacity: 1,
+          y: 0,
+          duration: 0.62,
+          stagger: 0.055,
+          ease: 'power3.out',
+          overwrite: true,
+        }),
         once: true,
       });
     }
 
-    const merchItems = $$('.mcard');
-    merchItems.forEach((el, index) => el.style.setProperty('--reveal-index', index));
-  }
-
-  function revealHistoryMedia() {
-    const scenes = $$('.doc-scene');
-    if (!scenes.length) return;
-    scenes.forEach((scene, index) => {
+    $$('.doc-scene').forEach((scene, index) => {
       ScrollTrigger.create({
         trigger: scene,
         start: 'top 86%',
@@ -207,41 +200,30 @@ body.scroll-locked,body.nav-locked{overflow:hidden;touch-action:none}
         onEnter: () => setTimeout(() => scene.classList.add('media-in'), Math.min(index, 5) * 70),
       });
     });
-  }
 
-  function setupParallax() {
-    if (!finePointer) return;
-    $$('.history__bg,.moments__bg,.footer__beam').forEach((el) => {
-      el.classList.add('motion-parallax');
-      gsap.to(el, { yPercent: el.classList.contains('footer__beam') ? 18 : 10, ease: 'none', scrollTrigger: { trigger: el.closest('.section') || el, start: 'top bottom', end: 'bottom top', scrub: true } });
-    });
-    $$('.scene__media img,.bandphoto img,.mcard__photo img,.photo__img').slice(0, 70).forEach((img) => {
-      if (img.tagName === 'VIDEO') return;
-      const trigger = img.closest('.doc-scene,.mcard,.photo,.section') || img;
-      gsap.to(img, { yPercent: -5, ease: 'none', scrollTrigger: { trigger, start: 'top bottom', end: 'bottom top', scrub: true } });
-    });
-  }
-
-  function setupMagneticButtons() {
-    if (!finePointer) return;
-    $$('.btn,.topnav__cta,.album__open,.footer__again,.ctrl--social').forEach((el) => {
-      const qx = gsap.quickTo(el, 'x', { duration: 0.35, ease: 'power3' });
-      const qy = gsap.quickTo(el, 'y', { duration: 0.35, ease: 'power3' });
-      el.addEventListener('mousemove', (event) => {
-        const r = el.getBoundingClientRect();
-        qx((event.clientX - (r.left + r.width / 2)) * 0.18);
-        qy((event.clientY - (r.top + r.height / 2)) * 0.22);
+    if (finePointer) {
+      $$('.history__bg,.moments__bg,.footer__beam').forEach((el) => {
+        el.classList.add('motion-parallax');
+        gsap.to(el, {
+          yPercent: el.classList.contains('footer__beam') ? 18 : 10,
+          ease: 'none',
+          scrollTrigger: { trigger: el.closest('.section') || el, start: 'top bottom', end: 'bottom top', scrub: true },
+        });
       });
-      el.addEventListener('mouseleave', () => { qx(0); qy(0); });
-    });
-  }
+      $$('.btn,.topnav__cta,.album__open,.footer__again,.ctrl--social').forEach((el) => {
+        const qx = gsap.quickTo(el, 'x', { duration: 0.35, ease: 'power3' });
+        const qy = gsap.quickTo(el, 'y', { duration: 0.35, ease: 'power3' });
+        el.addEventListener('mousemove', (event) => {
+          const r = el.getBoundingClientRect();
+          qx((event.clientX - (r.left + r.width / 2)) * 0.18);
+          qy((event.clientY - (r.top + r.height / 2)) * 0.22);
+        });
+        el.addEventListener('mouseleave', () => { qx(0); qy(0); });
+      });
+    }
 
-  function setupCardHoverPress() {
-    document.addEventListener('pointerdown', (event) => {
-      const target = event.target.closest('.btn,.topnav__cta,.ctrl,.mtab,.album__open,.footer__again');
-      if (target) target.classList.add('is-press');
-    }, { passive: true });
-    document.addEventListener('pointerup', () => $$('.is-press').forEach((el) => el.classList.remove('is-press')), { passive: true });
+    requestAnimationFrame(() => ScrollTrigger.refresh());
+    addEventListener('load', () => ScrollTrigger.refresh(), { once: true });
   }
 
   function setupPlayJourney() {
@@ -306,7 +288,7 @@ body.scroll-locked,body.nav-locked{overflow:hidden;touch-action:none}
     layer.innerHTML = '<div class="tr__vignette"></div><div class="tr__spot"></div><div class="tr__deck"><div class="tr__well"></div><div class="tr__cassette"><div class="tr__photo"><div class="tr__img"></div><div class="tr__develop"></div><div class="tr__grain"></div></div><div class="tr__casbody"></div><span class="tr__reel tr__reel--l"></span><span class="tr__reel tr__reel--r"></span><div class="tr__label">TRACK 01 — BUMBOX 20</div></div><div class="tr__door"></div></div>';
     body.appendChild(layer);
 
-    const q = (s) => layer.querySelector(s);
+    const q = (selector) => layer.querySelector(selector);
     const vignette = q('.tr__vignette');
     const spot = q('.tr__spot');
     const deck = q('.tr__deck');
@@ -316,6 +298,7 @@ body.scroll-locked,body.nav-locked{overflow:hidden;touch-action:none}
     const img = q('.tr__img');
     const grain = q('.tr__grain');
     const door = q('.tr__door');
+    if (img) img.style.backgroundImage = `url("${historyPhotoUrl}")`;
 
     const cr = cassetteWindow.getBoundingClientRect();
     const dr = deck.getBoundingClientRect();
@@ -351,6 +334,8 @@ body.scroll-locked,body.nav-locked{overflow:hidden;touch-action:none}
     const rect = photo.getBoundingClientRect();
     layer.appendChild(photo);
     photo.classList.add('is-flying');
+    const img = $('.tr__img', photo);
+    if (img) img.style.backgroundImage = `url("${historyPhotoUrl}")`;
     gsap.set(photo, { clearProps: 'transform' });
     Object.assign(photo.style, {
       position: 'fixed',
@@ -366,7 +351,6 @@ body.scroll-locked,body.nav-locked{overflow:hidden;touch-action:none}
       transformOrigin: '50% 50%',
     });
 
-    const grain = $('.tr__grain', photo);
     gsap.timeline({ defaults: { ease: 'power3.inOut' }, onComplete: () => finishJourney(layer) })
       .to(photo, {
         left: 0,
@@ -381,7 +365,7 @@ body.scroll-locked,body.nav-locked{overflow:hidden;touch-action:none}
         boxShadow: '0 0 0 rgba(0,0,0,0)',
         duration: innerWidth <= 720 ? 0.9 : 1.12,
       }, 0)
-      .to(grain, { opacity: 0.04, duration: 0.55, ease: 'power2.out' }, 0.08);
+      .to($('.tr__grain', photo), { opacity: 0.04, duration: 0.55, ease: 'power2.out' }, 0.08);
   }
 
   function finishJourney(layer) {
@@ -409,6 +393,8 @@ body.scroll-locked,body.nav-locked{overflow:hidden;touch-action:none}
 
   function settleAtHistoryFrame() {
     const hero = $('#hero');
+    const heroPhoto = $('.hero-photo');
+    if (heroPhoto) heroPhoto.style.setProperty('background-image', `url("${historyPhotoUrl}")`, 'important');
     if (hero) hero.classList.add('hero--history-settled');
     scrollImmediate(heroEndScroll());
     const hProgress = $('#historyProgress');
@@ -419,8 +405,7 @@ body.scroll-locked,body.nav-locked{overflow:hidden;touch-action:none}
 
   function heroEndScroll() {
     const hero = $('#hero');
-    if (!hero) return 0;
-    return Math.max(0, hero.offsetHeight - innerHeight);
+    return hero ? Math.max(0, hero.offsetHeight - innerHeight) : 0;
   }
 
   function scrollImmediate(y) {
@@ -432,7 +417,9 @@ body.scroll-locked,body.nav-locked{overflow:hidden;touch-action:none}
 
   const blockScroll = (event) => event.preventDefault();
   const blockKeys = (event) => {
-    if (['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' ', 'Spacebar'].includes(event.key)) event.preventDefault();
+    if (['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' ', 'Spacebar'].includes(event.key)) {
+      event.preventDefault();
+    }
   };
 
   function lockScroll(on) {
@@ -458,10 +445,10 @@ body.scroll-locked,body.nav-locked{overflow:hidden;touch-action:none}
       const ctx = audioContext;
       const now = ctx.currentTime;
       if (kind === 'click') {
-        const n = Math.floor(ctx.sampleRate * 0.045);
-        const buffer = ctx.createBuffer(1, n, ctx.sampleRate);
+        const count = Math.floor(ctx.sampleRate * 0.045);
+        const buffer = ctx.createBuffer(1, count, ctx.sampleRate);
         const data = buffer.getChannelData(0);
-        for (let i = 0; i < n; i += 1) data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / n, 3.2);
+        for (let i = 0; i < count; i += 1) data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / count, 3.2);
         const source = ctx.createBufferSource();
         const gain = ctx.createGain();
         gain.gain.value = 0.055;
@@ -493,7 +480,7 @@ body.scroll-locked,body.nav-locked{overflow:hidden;touch-action:none}
     }
   }
 
-  function setupMomentsExperience() {
+  function setupMoments() {
     const moments = $('#moments');
     const cam = $('#filmcam');
     const scatter = $('#scatter');
@@ -502,113 +489,40 @@ body.scroll-locked,body.nav-locked{overflow:hidden;touch-action:none}
     if (!photos().length) return;
     moments.classList.add('moments--armed');
 
-    const shutter = document.createElement('div');
-    shutter.className = 'cam-shutter';
-    shutter.setAttribute('aria-hidden', 'true');
-    shutter.innerHTML = '<span class="cam-shutter__t"></span><span class="cam-shutter__b"></span>';
-    const flash = document.createElement('div');
-    flash.className = 'cam-flash';
-    flash.setAttribute('aria-hidden', 'true');
-    body.append(shutter, flash);
-
     let revealed = false;
     const reveal = () => {
       if (revealed) return;
       revealed = true;
       moments.classList.add('moments--revealed');
+      if (!gsap) return;
       const lens = $('.filmcam__lens', cam) || cam;
       const lr = lens.getBoundingClientRect();
       const cx = lr.left + lr.width / 2;
       const cy = lr.top + lr.height / 2;
-
-      if (gsap) {
-        const topBlade = $('.cam-shutter__t', shutter);
-        const bottomBlade = $('.cam-shutter__b', shutter);
-        gsap.set([shutter, flash], { display: 'block' });
-        gsap.set(topBlade, { yPercent: -101 });
-        gsap.set(bottomBlade, { yPercent: 101 });
-        gsap.timeline({ onComplete: () => gsap.set([shutter, flash], { display: 'none' }) })
-          .to(topBlade, { yPercent: 0, duration: 0.1, ease: 'power2.in' }, 0)
-          .to(bottomBlade, { yPercent: 0, duration: 0.1, ease: 'power2.in' }, 0)
-          .to(flash, { opacity: 0.85, duration: 0.05 }, 0.1)
-          .to(flash, { opacity: 0, duration: 0.28 }, 0.16)
-          .to(topBlade, { yPercent: -101, duration: 0.18, ease: 'power2.out' }, 0.18)
-          .to(bottomBlade, { yPercent: 101, duration: 0.18, ease: 'power2.out' }, 0.18);
-
-        photos().forEach((photo, index) => {
-          const r = photo.getBoundingClientRect();
-          const dx = cx - (r.left + r.width / 2);
-          const dy = cy - (r.top + r.height / 2);
-          gsap.fromTo(photo, { x: dx, y: dy, scale: 0.24, opacity: 0, rotation: (index % 2 ? 14 : -14) }, {
-            x: 0,
-            y: 0,
-            scale: 1,
-            opacity: 1,
-            rotation: 0,
-            duration: 0.72,
-            delay: 0.2 + index * 0.035,
-            ease: 'back.out(1.16)',
-            onComplete: () => { photo.style.opacity = ''; photo.style.transform = ''; },
-          });
+      photos().forEach((photo, index) => {
+        const r = photo.getBoundingClientRect();
+        gsap.fromTo(photo, {
+          x: cx - (r.left + r.width / 2),
+          y: cy - (r.top + r.height / 2),
+          scale: 0.24,
+          opacity: 0,
+          rotation: index % 2 ? 14 : -14,
+        }, {
+          x: 0,
+          y: 0,
+          scale: 1,
+          opacity: 1,
+          rotation: 0,
+          duration: 0.72,
+          delay: 0.2 + index * 0.035,
+          ease: 'back.out(1.16)',
+          onComplete: () => { photo.style.opacity = ''; photo.style.transform = ''; },
         });
-      }
+      });
     };
 
     const vf = $('#filmVf') || cam;
     vf.addEventListener('click', (event) => { event.stopPropagation(); reveal(); });
     cam.addEventListener('click', reveal);
-  }
-
-  function setupLightbox() {
-    const scatter = $('#scatter');
-    if (!scatter) return;
-    const box = document.createElement('div');
-    box.className = 'lightbox';
-    box.setAttribute('aria-hidden', 'true');
-    const pic = document.createElement('img');
-    pic.className = 'lightbox__pic';
-    pic.alt = '';
-    const cap = document.createElement('p');
-    cap.className = 'lightbox__cap';
-    const close = document.createElement('button');
-    close.type = 'button';
-    close.className = 'lightbox__close';
-    close.textContent = 'Закрити ✕';
-    close.setAttribute('aria-label', 'Закрити');
-    box.append(pic, cap, close);
-    body.appendChild(box);
-
-    const place = () => {
-      const ar = pic.naturalWidth && pic.naturalHeight ? pic.naturalWidth / pic.naturalHeight : 1;
-      const maxW = innerWidth * 0.9;
-      const maxH = innerHeight * 0.82;
-      let w = maxW;
-      let h = w / ar;
-      if (h > maxH) { h = maxH; w = h * ar; }
-      Object.assign(pic.style, { display: 'block', left: (innerWidth - w) / 2 + 'px', top: (innerHeight - h) / 2 + 'px', width: w + 'px', height: h + 'px' });
-    };
-    const shut = () => {
-      box.classList.remove('open');
-      box.setAttribute('aria-hidden', 'true');
-      pic.style.display = 'none';
-    };
-
-    scatter.addEventListener('click', (event) => {
-      const card = event.target.closest('.photo__card');
-      if (!card) return;
-      const img = $('.photo__img', card);
-      if (!img || img.tagName !== 'IMG') return;
-      pic.src = img.getAttribute('src');
-      pic.alt = img.getAttribute('alt') || '';
-      cap.textContent = img.getAttribute('alt') || '';
-      box.classList.add('open');
-      box.setAttribute('aria-hidden', 'false');
-      if (pic.complete && pic.naturalWidth) place();
-      else pic.onload = place;
-      close.focus();
-    });
-    close.addEventListener('click', shut);
-    box.addEventListener('click', (event) => { if (event.target === box) shut(); });
-    addEventListener('keydown', (event) => { if (event.key === 'Escape' && box.classList.contains('open')) shut(); });
   }
 })();
