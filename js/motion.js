@@ -21,6 +21,17 @@
   const Lenis = window.Lenis;
   const hasGSAP = !!gsap && !!ScrollTrigger;
 
+  installMobileStyles();
+
+  function installMobileStyles() {
+    if (document.getElementById('bumbox-mobile-css')) return;
+    const link = document.createElement('link');
+    link.id = 'bumbox-mobile-css';
+    link.rel = 'stylesheet';
+    link.href = 'css/mobile.css';
+    link.media = '(max-width: 720px)';
+    document.head.appendChild(link);
+  }
   function finishLoader() { if (loader) loader.classList.add('is-done'); }
 
   /* ---- minimal mode: reduced motion or missing libs ---------------- */
