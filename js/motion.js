@@ -70,17 +70,6 @@
       document.head.appendChild(style);
     }
 
-    const cursor = $('.cursor');
-    if (cursor && matchMedia('(pointer: fine)').matches) {
-      let frame = 0;
-      const place = (x, y) => {
-        cursor.style.transform = `translate(${x}px,${y}px) translate(-50%,-50%)`;
-      };
-      addEventListener('mousemove', (e) => {
-        cancelAnimationFrame(frame);
-        frame = requestAnimationFrame(() => place(e.clientX, e.clientY));
-      }, { passive: true });
-    }
   }
   function finishLoader() { if (loader) loader.classList.add('is-done'); }
 
